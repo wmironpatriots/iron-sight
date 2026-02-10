@@ -10,9 +10,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") # warn all
 
 option(ENABLE_CLANG_TIDY "Enable clang-tidy for static analysis" ON)
 
-find_package(wpilib 2026.2.1 REQUIRED)
-find_package(OpenCV 4.13.0 REQUIRED)
-find_package(apriltag 3.4.5 REQUIRED)
-find_package(nlohmann_json 3.12.0 REQUIRED)
+# Add vendor dirs
+add_subdirectory(vendor/json)
+add_subdirectory(vendor/opencv)
+add_subdirectory(vendor/apriltag)
+add_subdirectory(vendor/allwpilib)
 
 add_subdirectory(src)
