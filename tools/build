@@ -1,0 +1,4 @@
+#!/bin/bash
+# Build and run clang tidy
+cmake -B build -G Ninja
+cmake --build build
