@@ -7,10 +7,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #include "src/camera/CameraIOcv.h"
-#include <frc/Timer.h>
-#include <opencv2/core/mat.hpp>
-#include <opencv2/videoio.hpp>
-#include "src/camera/Camera.h"
 
 namespace camera {
     CameraIOcv::CameraIOcv(const CameraConfig& config) {

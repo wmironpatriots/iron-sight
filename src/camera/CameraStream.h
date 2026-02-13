@@ -8,12 +8,7 @@
 // MIT license file in the root directory of this project
 #pragma once
 
-#include <memory>
-#include <mutex>
-#include <opencv2/core/mat.hpp>
-#include <thread>
 #include "src/camera/Camera.h"
-#include "src/utils/PCH.h"
 
 namespace camera {
     /** Represents a continious stream of timestamped frames from camera */

@@ -8,8 +8,6 @@
 // MIT license file in the root directory of this project
 #pragma once
 
-#include <opencv2/core/mat.hpp>
-#include "src/utils/PCH.h"
 #include "src/camera/Camera.h"
 
 namespace camera {

@@ -8,10 +8,6 @@
 // MIT license file in the root directory of this project
 
 #include "src/camera/CameraStream.h"
-#include <memory>
-#include <opencv2/core/mat.hpp>
-#include <thread>
-#include "src/camera/Camera.h"
 
 namespace camera {
     CameraStream::CameraStream(std::unique_ptr<CameraIO> io) : mIO(std::move(io)) {
