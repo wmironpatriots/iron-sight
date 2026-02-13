@@ -10,6 +10,7 @@ if(ENABLE_CLANG_TIDY)
     )
 endif()
 
+add_subdirectory(camera)
 add_subdirectory(utils)
 
 # Binary for center cameras coproc
