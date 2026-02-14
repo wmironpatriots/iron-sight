@@ -1,15 +1,15 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// File: CameraIOcv.cc
+// File: CameraCv.cc
 // Purpose: Define base camera hardware interface
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
-#include "src/camera/CameraIOcv.h"
+#include "src/camera/CameraCv.h"
 
 namespace camera {
-    CameraIOcv::CameraIOcv(const CameraConfig& config) {
+    CameraCv::CameraCv(const CameraConfig& config) {
         mConfig = config;
         mCameraCapture = cv::VideoCapture(config.deviceId, config.apiId);
 
@@ -20,7 +20,7 @@ namespace camera {
         }
     }
 
-    auto CameraIOcv::getTimestampedFrame() -> TimestampedFrame {
+    auto CameraCv::getTimestampedFrame() -> TimestampedFrame {
         TimestampedFrame tframe;
         mCameraCapture.read(tframe.frame);
         tframe.timestamp = frc::Timer::GetFPGATimestamp();

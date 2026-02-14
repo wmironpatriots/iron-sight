@@ -2,7 +2,7 @@
 // https://github.com/wmironpatriots
 //
 // File: Camera.h
-// Purpose: Define camera structs & base classes
+// Purpose: Define camera structs & base camera class
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
@@ -28,10 +28,10 @@ namespace camera {
     };
 
     /** Hardware interface for interacting with a camera */
-    class CameraIO {
+    class Camera {
         public:
-            virtual ~CameraIO() = default;
-            /** returns dense matrix representing raw recorded frame */
+            virtual ~Camera() = default;
+            /** @return dense matrix representing raw recorded frame */
             virtual auto getFrame() -> cv::Mat;
             /** returns TimestampedFrame representing the frame recorded at a specific timestamp*/
             virtual auto getTimestampedFrame() -> TimestampedFrame;

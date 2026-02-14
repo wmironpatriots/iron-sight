@@ -10,7 +10,7 @@
 #include "src/camera/CameraStream.h"
 
 namespace camera {
-    CameraStream::CameraStream(std::unique_ptr<CameraIO> io) : mIO(std::move(io)) {
+    CameraStream::CameraStream(std::unique_ptr<Camera> io) : mIO(std::move(io)) {
         mTimestampedFrame = mIO->getTimestampedFrame();
 
         mThread = std::thread([this] () -> void {

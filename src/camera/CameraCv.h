@@ -1,7 +1,7 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// File: CameraIOcv.h
+// File: CameraCv.h
 // Purpose: Define base camera hardware interface
 // 
 // Open Source Software; you can modify and/or share it under the terms of
@@ -12,9 +12,9 @@
 
 namespace camera {
     /** CameraIO implementation for openCV cam */
-    class CameraIOcv : CameraIO {
+    class CameraCv : Camera {
         public:
-            CameraIOcv(const CameraConfig& config);
+            CameraCv(const CameraConfig& config);
             auto getTimestampedFrame() -> TimestampedFrame override;
         private:
             CameraConfig mConfig;
