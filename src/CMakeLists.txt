@@ -12,7 +12,7 @@ endif()
 
 add_subdirectory(camera)
 add_subdirectory(utils)
-add_subdirectory()
+add_subdirectory(localization)
 
 # Binary for center cameras coproc
 add_executable(u1 u1_main.cc)
