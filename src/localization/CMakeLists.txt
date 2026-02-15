@@ -1,6 +1,6 @@
-add_library(camera CameraIOcv.cc CameraStream.cc) 
-target_link_libraries(camera PUBLIC wpilibc nlohmann_json::nlohmann_json OpenCV utils)
+add_library(localization AprilTagDetector.cc) 
+target_link_libraries(localization PUBLIC wpilibc nlohmann_json::nlohmann_json OpenCV utils)
 
 if(!ENABLE_CLANG_TIDY)
-  target_precompile_headers(camera PUBLIC Camera.h CameraIOcv.h CameraStream.h)
+  target_precompile_headers(localization PUBLIC AprilTagDetector.h)
 endif()
