@@ -1,4 +1,4 @@
-add_library(camera CameraIOcv.cc CameraStream.cc) 
+add_library(camera CameraCv.cc CameraStream.cc) 
 target_link_libraries(camera PUBLIC wpilibc nlohmann_json::nlohmann_json OpenCV utils)
 
 if(!ENABLE_CLANG_TIDY)
