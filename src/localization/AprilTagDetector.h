@@ -5,6 +5,6 @@ namespace localization {
     class AprilTagDetector {
         public:
             virtual ~AprilTagDetector() = default;
-            virtual auto getDetectedTags() -> std::vector<apriltag_detection_t*>;
+            virtual auto detectTags() -> std::vector<apriltag_detection_t*>;
     };
 }
