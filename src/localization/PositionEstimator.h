@@ -10,7 +10,7 @@
 
 #include "src/utils/PCH.h"
 
-namespace localiztaion {
+namespace localization {
     /** Represents a found apriltag from a tframe */
     using found_apriltag_t = struct FoundAprilTag {
         /** The unique id of tag */

@@ -11,6 +11,6 @@ namespace localization {
         public:
             // TODO
             AprilTagFinderCv();
-            auto findTags(camera::TimestampedFrame& tframe) -> std::vector<localiztaion::found_apriltag_t*> override;
+            auto findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t*> override;
     };
 }

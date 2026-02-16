@@ -18,6 +18,6 @@ namespace localization {
         public:
             virtual ~IAprilTagSearcher() = default;
             /** Returns a vector of found april tags from a timestamped frame */
-            virtual auto findTags(camera::TimestampedFrame& tframe) -> std::vector<localiztaion::found_apriltag_t*>;
+            virtual auto findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t*>;
     };
 }
