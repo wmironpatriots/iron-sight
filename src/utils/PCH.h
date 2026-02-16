@@ -33,9 +33,10 @@
 #include <sleipnir/optimization/problem.hpp>
 
 // FRC/WPILib
-#include <wpilibc/frc/DataLogManager.h>
 #include <wpilibc/frc/Timer.h>
+#include <wpilibc/frc/DataLogManager.h>
 #include <ntcore/networktables/NetworkTableInstance.h>
+#include <wpimath/frc/geometry/Pose3d.h>
 
 // JSON
 #include <nlohmann/json.hpp>
