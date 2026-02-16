@@ -1,7 +1,7 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// File: PositionEstimator
+// File: PositionEstimator.h
 // Purpose: Define localization structs + Base PositionSolver class
 //
 // Open Source Software; you can modify and/or share it under the terms of
@@ -9,7 +9,7 @@
 #pragma once
 
 #include "src/utils/PCH.h"
-#include "src/localization/AprilTagFinder.h"
+#include "src/localization/AprilTagSearcher.h"
 
 namespace localization {
     /** Represents a robot position estimate in 3D space (x, y, z) */
@@ -24,8 +24,9 @@ namespace localization {
 
     /** Represents a class for estimating robot positions from found tags */
     class IPositionEstimator {
-        virtual ~IPositionEstimator() = default;
-        /** Return 3d position estimates from found tags */
-        virtual auto estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> = 0;
+        public:
+            virtual ~IPositionEstimator() = default;
+            /** Return 3d position estimates from found tags */
+            virtual auto estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> = 0;
     };
 }

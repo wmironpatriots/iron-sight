@@ -1,8 +1,8 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// File: AprilTagFinder.h
-// Purpose: Define base AprilTagFinder class
+// File: AprilTagSearcher.h
+// Purpose: Define base AprilTagSearcher structs & class
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project

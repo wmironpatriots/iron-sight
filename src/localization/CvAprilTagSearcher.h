@@ -1,16 +1,20 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
+// File: CvAprilTagSearcher.h
+// Purpose: Define AprilTagSearcher with OpenCV backend
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
-#include "src/localization/AprilTagFinder.h"
+#pragma once
+
+#include "src/localization/AprilTagSearcher.h"
 
 namespace localization {
-    class CvAprilTagFinder : IAprilTagSearcher {
+    class CvAprilTagSearcher : IAprilTagSearcher {
         public:
             // TODO
-            CvAprilTagFinder();
+            CvAprilTagSearcher();
             auto findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t*> override;
     };
 }
