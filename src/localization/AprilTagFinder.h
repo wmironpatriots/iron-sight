@@ -9,10 +9,19 @@
 #pragma once
 
 #include "src/utils/PCH.h"
-#include "src/localization/PositionEstimator.h"
 #include "src/camera/Camera.h"
 
 namespace localization {
+    /** Represents a found apriltag from a tframe */
+    using found_apriltag_t = struct FoundAprilTag {
+        /** The unique id of tag */
+        int tag_id;
+        /** An array of each tag corner coordinate in pixels */
+        std::array<cv::Point2d, 4> cornerCoords;
+        /** The timestamp in seconds representing when this tag was viewed at this angle aka the timestamp of the timestamped_frame_t it was derived from */
+        double timestampSeconds;
+    };
+
     /** An interface for finding AprilTags in frames */
     class IAprilTagSearcher {
         public:

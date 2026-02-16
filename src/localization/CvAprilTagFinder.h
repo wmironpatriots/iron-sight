@@ -7,10 +7,10 @@
 #include "src/localization/AprilTagFinder.h"
 
 namespace localization {
-    class AprilTagFinderCv : IAprilTagSearcher {
+    class CvAprilTagFinder : IAprilTagSearcher {
         public:
             // TODO
-            AprilTagFinderCv();
+            CvAprilTagFinder();
             auto findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t*> override;
     };
 }
