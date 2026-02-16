@@ -10,6 +10,8 @@
 
 #include "src/utils/PCH.h"
 #include "src/camera/Camera.h"
+#include <apriltag/apriltag.h>
+#include "tag36h11.h"
 
 namespace localization {
     /** Represents a found apriltag from a tframe */
@@ -20,6 +22,10 @@ namespace localization {
         std::array<cv::Point2d, 4> cornerCoords;
         /** The timestamp in seconds representing when this tag was viewed at this angle aka the timestamp of the timestamped_frame_t it was derived from */
         double timestampSeconds;
+        /**The decision margin, "A measure of the quality of the binary decoding process: the average difference between the intensity of a data bit versus the decision threshold." */
+        float decision_margin;
+        /**The center of the detection in image pixel coordinates*/
+        double center[2];
     };
 
     /** An interface for finding AprilTags in frames */
