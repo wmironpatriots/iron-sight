@@ -14,10 +14,10 @@
 
 namespace localization {
     /** An interface for finding AprilTags in frames */
-    class IAprilTagFinder {
+    class IAprilTagSearcher {
         public:
-            virtual ~IAprilTagFinder() = default;
-            /** Returns a vector of detected april tags from a timestamped frame */
-            virtual auto findTags(camera::TimestampedFrame& tframe) -> std::vector<localiztaion::detected_apriltag_t*>;
+            virtual ~IAprilTagSearcher() = default;
+            /** Returns a vector of found april tags from a timestamped frame */
+            virtual auto findTags(camera::TimestampedFrame& tframe) -> std::vector<localiztaion::found_apriltag_t*>;
     };
 }

@@ -11,8 +11,8 @@
 #include "src/utils/PCH.h"
 
 namespace localiztaion {
-    /** Represents a detected apriltag from a tframe */
-    using detected_apriltag_t = struct AprilTagDetection {
+    /** Represents a found apriltag from a tframe */
+    using found_apriltag_t = struct FoundAprilTag {
         /** The unique id of tag */
         int tag_id;
         /** An array of each tag corner coordinate in pixels */
@@ -31,10 +31,10 @@ namespace localiztaion {
         double variance;
     };
 
-    /** Represents a class for estimating robot positions from detected tags */
+    /** Represents a class for estimating robot positions from found tags */
     class IPositionEstimator {
         virtual ~IPositionEstimator() = default;
-        /** Return 3d position estimates from detected tags */
-        virtual auto estimatePosition(const std::vector<detected_apriltag_t>& detected_tags) -> std::vector<pose3d_estimate_t> = 0;
+        /** Return 3d position estimates from found tags */
+        virtual auto estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> = 0;
     };
 }
