@@ -9,7 +9,7 @@
 #include "src/localization/CvAprilTagSearcher.h"
 
 namespace localization {
-    CvAprilTagSearcher::CvAprilTagSearcher(){}
+    CvAprilTagSearcher::CvAprilTagSearcher() = default;
 
     auto CvAprilTagSearcher::findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t*> {
         apriltag_family_t *tf = tag36h11_create();
