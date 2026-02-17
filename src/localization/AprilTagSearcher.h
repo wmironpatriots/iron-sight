@@ -25,7 +25,7 @@ namespace localization {
         /**The decision margin, "A measure of the quality of the binary decoding process: the average difference between the intensity of a data bit versus the decision threshold." */
         float decision_margin;
         /**The center of the detection in image pixel coordinates*/
-        double center[2];
+        cv::Point2d center;
     };
 
     /** An interface for finding AprilTags in frames */

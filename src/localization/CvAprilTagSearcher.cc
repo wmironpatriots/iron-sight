@@ -13,14 +13,14 @@ namespace localization {
 
     auto CvAprilTagSearcher::findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t*> {
         apriltag_family_t *tf = tag36h11_create();
-        apriltag_detector_t *td = apriltag_Detector_create();
+        apriltag_detector_t *td = apriltag_detector_create();
 
         apriltag_detector_add_family(td, tf);
         
         td->quad_decimate = 2.0;
         td->quad_sigma = 0.0;
         td->nthreads = 4;
-        cv::Mat frame = tframe->frame;
+        cv::Mat frame = tframe.frame;
         image_u8_t image = {frame.cols, frame.rows, frame.cols, frame.data};
         
         zarray_t* raw_detections = apriltag_detector_detect(td, &image);
@@ -34,14 +34,15 @@ namespace localization {
             found_apriltag_t detection;
             detection.tag_id = single_detection->id;
             detection.decision_margin = single_detection->decision_margin;
-            detection.center = single_detection->c;
-            detection.timestampSeconds = tframe->timestamp;
+            detection.center = cv::Point2d(single_detection->c[0], single_detection->c[1]);
+            detection.timestampSeconds = tframe.timestamp.value();
             
             for (int j = 0; j < 4; j++){
-                detection.cornerCoords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][0]);
+                detection.cornerCoords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][1]);
             }
-            tag_detections.push_back(detection);
+            tag_detections.push_back(&detection);
         }
+        return tag_detections;
     }
-    return tag_detections;
+    
 }
