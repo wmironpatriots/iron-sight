@@ -34,11 +34,11 @@ namespace localization {
             found_apriltag_t detection;
             detection.tag_id = single_detection->id;
             detection.decision_margin = single_detection->decision_margin;
-            detection.center = single_detection->c
+            detection.center = single_detection->c;
             detection.timestampSeconds = tframe->timestamp;
             
             for (int j = 0; j < 4; j++){
-                detection.cornerCoords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][0])
+                detection.cornerCoords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][0]);
             }
             tag_detections.push_back(detection);
         }
