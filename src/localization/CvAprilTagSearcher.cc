@@ -7,11 +7,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #include "src/localization/CvAprilTagSearcher.h"
+#include <apriltag.h>
 
 namespace localization {
     CvAprilTagSearcher::CvAprilTagSearcher() {
-        apriltag_family_t *tf = tag36h11_create();
-        apriltag_detector_t *td = apriltag_detector_create();
+        tf = tag36h11_create();
+        td = apriltag_detector_create();
         apriltag_detector_add_family(td, tf);
         td->quad_decimate = 2.0;
         td->quad_sigma = 0.0;
@@ -53,4 +54,9 @@ namespace localization {
         return tag_detections;
     }
     
+    CvAprilTagSearcher::~CvAprilTagSearcher() {
+        if (td != nullptr) {
+            apriltag_detector_destroy(td);
+        }
+    }
 }
