@@ -13,6 +13,18 @@
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
 #include <cmath>
+#include <opencv2/core/version.hpp>
+
+namespace {
+auto PumpGuiEventsAndGetKey() -> int {
+#if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
+    return cv::pollKey();
+#else
+    return cv::waitKey(1);
+#endif
+}
+}
+
 //demo made from a lot of chatgpt bc i cant be bothered to make this myself
 auto main() -> int {
     camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_ANY));
@@ -20,7 +32,6 @@ auto main() -> int {
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
     while (true) {
-        std::cerr <<"test";
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
 
@@ -32,8 +43,6 @@ auto main() -> int {
                     static_cast<int>(std::lround(corner.x)),
                     static_cast<int>(std::lround(corner.y))
                 );
-                std::cout << corner.x;
-                std::cout << corner.y;
             }
             std::vector<std::vector<cv::Point>> contours = {corners};
             cv::polylines(tframe.frame, contours, true, cv::Scalar(0, 255, 0), 2);
@@ -48,7 +57,7 @@ auto main() -> int {
         }
         
         cv::imshow(windowName, tframe.frame);
-        if (cv::waitKey(1) == 'q') {
+        if (PumpGuiEventsAndGetKey() == 'q') {
             break;
         }
     }
