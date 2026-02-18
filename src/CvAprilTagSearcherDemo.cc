@@ -27,10 +27,11 @@ auto PumpGuiEventsAndGetKey() -> int {
 
 //demo made from a lot of chatgpt bc i cant be bothered to make this myself
 auto main() -> int {
-    camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_ANY));
+    camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_V4L2));
     localization::CvAprilTagSearcher searcher;
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+    
     while (true) {
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
@@ -45,17 +46,16 @@ auto main() -> int {
                 );
             }
             std::vector<std::vector<cv::Point>> contours = {corners};
-            cv::polylines(tframe.frame, contours, true, cv::Scalar(0, 255, 0), 2);
+            cv::polylines(tframe.frame, contours, true, cv::Scalar(0, 255, 0), 7);
             for (auto & corner : corners) {
-                cv::circle(tframe.frame, corner, 5, cv::Scalar(0, 0, 255), -1);
+                cv::circle(tframe.frame, corner, 15, cv::Scalar(0, 0, 255), -1);
             }
             cv::Point2d center = detection.center;
             cv::putText(tframe.frame, "ID: " + std::to_string(detection.tag_id),
-                       center, cv::FONT_HERSHEY_SIMPLEX, 0.7,
-                       cv::Scalar(255, 0, 0), 2);
+                       center, cv::FONT_HERSHEY_SIMPLEX, 3,
+                       cv::Scalar(255, 0, 0), 5);
             
         }
-        
         cv::imshow(windowName, tframe.frame);
         if (PumpGuiEventsAndGetKey() == 'q') {
             break;
