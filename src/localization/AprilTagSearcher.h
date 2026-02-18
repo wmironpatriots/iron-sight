@@ -11,7 +11,7 @@
 #include "src/utils/PCH.h"
 #include "src/camera/Camera.h"
 #include <apriltag/apriltag.h>
-#include "tag36h11.h"
+#include <apriltag/tag36h11.h>
 
 namespace localization {
     /** Represents a found apriltag from a tframe */
