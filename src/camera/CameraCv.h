@@ -14,7 +14,9 @@ namespace camera {
     /** CameraIO implementation for openCV cam */
     class CameraCv : public Camera {
         public:
-            CameraCv(const CameraConfig& config);            auto getFrame() -> cv::Mat override;            auto getTimestampedFrame() -> TimestampedFrame override;
+            CameraCv(const CameraConfig& config);            
+            auto getFrame() -> cv::Mat override;            
+            auto getTimestampedFrame() -> TimestampedFrame override;
         private:
             CameraConfig mConfig;
             cv::VideoCapture mCameraCapture;
