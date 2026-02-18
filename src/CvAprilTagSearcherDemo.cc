@@ -12,23 +12,30 @@
 #include "src/camera/CameraStream.h"
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
+#include <cmath>
 //demo made from a lot of chatgpt bc i cant be bothered to make this myself
 auto main() -> int {
-    camera::CameraCv camera(camera::CameraConfig(0, cv::CAP_ANY));
+    camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_ANY));
     localization::CvAprilTagSearcher searcher;
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
     while (true) {
+        std::cerr <<"test";
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
 
         for (const auto& detection : detections){
-            std::vector<cv::Point2d> corners;
+            std::vector<cv::Point> corners;
             corners.reserve(detection.cornerCoords.size());
         for (const auto& corner : detection.cornerCoords) {
-                corners.push_back(corner);
+                corners.emplace_back(
+                    static_cast<int>(std::lround(corner.x)),
+                    static_cast<int>(std::lround(corner.y))
+                );
+                std::cout << corner.x;
+                std::cout << corner.y;
             }
-            std::vector<std::vector<cv::Point2d>> contours = {corners};
+            std::vector<std::vector<cv::Point>> contours = {corners};
             cv::polylines(tframe.frame, contours, true, cv::Scalar(0, 255, 0), 2);
             for (auto & corner : corners) {
                 cv::circle(tframe.frame, corner, 5, cv::Scalar(0, 0, 255), -1);

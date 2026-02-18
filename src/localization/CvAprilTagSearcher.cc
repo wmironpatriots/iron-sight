@@ -9,22 +9,28 @@
 #include "src/localization/CvAprilTagSearcher.h"
 
 namespace localization {
-    CvAprilTagSearcher::CvAprilTagSearcher() = default;
-
-    auto CvAprilTagSearcher::findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {
+    CvAprilTagSearcher::CvAprilTagSearcher() {
         apriltag_family_t *tf = tag36h11_create();
         apriltag_detector_t *td = apriltag_detector_create();
-
         apriltag_detector_add_family(td, tf);
-        
         td->quad_decimate = 2.0;
         td->quad_sigma = 0.0;
         td->nthreads = 4;
-        cv::Mat frame = tframe.frame;
+    };
+
+    auto CvAprilTagSearcher::findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {
+        std::cout << "searching";
+        apriltag_detector_add_family(td, tf);
+        td->quad_decimate = 2.0;
+        td->quad_sigma = 0.0;
+        td->nthreads = 4;
+        cv::Mat framec = tframe.frame;
+        cv::Mat frame;
+        cv::cvtColor(framec, frame, cv::COLOR_BGR2GRAY);
         image_u8_t image = {frame.cols, frame.rows, frame.cols, frame.data};
         
         zarray_t* raw_detections = apriltag_detector_detect(td, &image);
-
+        std::cerr << zarray_size(raw_detections);
         std::vector<found_apriltag_t> tag_detections{};
 
         for (int i = 0; i < zarray_size(raw_detections); i++){
@@ -39,9 +45,11 @@ namespace localization {
             
             for (int j = 0; j < 4; j++){
                 detection.cornerCoords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][1]);
+                std::cerr << "found corner" << single_detection->p[j][0];
             }
             tag_detections.push_back(detection);
         }
+        apriltag_detections_destroy(raw_detections);
         return tag_detections;
     }
     
