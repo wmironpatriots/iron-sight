@@ -24,4 +24,8 @@ add_executable(u2 u2_main.cc)
 target_link_directories(u2 PRIVATE ${OpenCV_LIBS} apriltag ntcore nlohmann_json::nlohmann_json utils)
 # set_target_properties(u2 PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_DIR}/bin")
 
+# Demo executable for CvAprilTagSearcher
+add_executable(cvapriltagsearcher_demo CvAprilTagSearcherDemo.cc)
+target_link_libraries(cvapriltagsearcher_demo PRIVATE localization camera utils)
+
 set(CMAKE_CXX_CLANG_TIDY "")
