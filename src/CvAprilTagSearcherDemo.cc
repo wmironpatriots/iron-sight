@@ -31,8 +31,6 @@ auto main() -> int {
     camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_V4L2));
     localization::CvAprilTagSearcher searcher;
 
-    auto timer = frc::Timer();
-
     // const std::string windowName = "AprilTag Detection Demo";
     // cv::namedWindow(windowName, cv::WINDOW_NORMAL);
 
