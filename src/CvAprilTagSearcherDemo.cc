@@ -7,6 +7,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 
+#include <frc/Timer.h>
 #include "src/camera/Camera.h"
 #include "src/camera/CameraCv.h"
 #include "src/camera/CameraStream.h"
@@ -15,24 +16,28 @@
 #include <cmath>
 #include <opencv2/core/version.hpp>
 
-namespace {
-auto PumpGuiEventsAndGetKey() -> int {
-#if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
-    return cv::pollKey();
-#else
-    return cv::waitKey(1);
-#endif
-}
-}
+// namespace {
+// auto PumpGuiEventsAndGetKey() -> int {
+// #if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
+//     return cv::pollKey();
+// #else
+//     return cv::waitKey(1);
+// #endif
+// }
+// }
 
 //demo made from a lot of chatgpt bc i cant be bothered to make this myself
 auto main() -> int {
     camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_V4L2));
     localization::CvAprilTagSearcher searcher;
-    const std::string windowName = "AprilTag Detection Demo";
-    cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
-    
+
+    auto timer = frc::Timer();
+
+    // const std::string windowName = "AprilTag Detection Demo";
+    // cv::namedWindow(windowName, cv::WINDOW_NORMAL);
+
     while (true) {
+
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
 
@@ -56,11 +61,12 @@ auto main() -> int {
                        cv::Scalar(255, 0, 0), 5);
             
         }
-        cv::imshow(windowName, tframe.frame);
-        if (PumpGuiEventsAndGetKey() == 'q') {
-            break;
-        }
+        // cv::imshow(windowName, tframe.frame);
+        // if (PumpGuiEventsAndGetKey() == 'q') {
+        //     break;
+        // }
     }
-    cv::destroyAllWindows();
+
+    // cv::destroyAllWindows();
     return 0;
 }
