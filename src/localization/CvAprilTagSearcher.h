@@ -12,7 +12,7 @@
 
 namespace localization {
     // TODO
-    class CvAprilTagSearcher : IAprilTagSearcher {
+    class CvAprilTagSearcher : public IAprilTagSearcher {
         public:
             CvAprilTagSearcher();
             auto findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> override;

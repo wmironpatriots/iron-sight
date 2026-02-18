@@ -20,6 +20,12 @@ namespace camera {
         }
     }
 
+    auto CameraCv::getFrame() -> cv::Mat {
+        cv::Mat frame;
+        mCameraCapture.read(frame);
+        return frame;
+    }
+
     auto CameraCv::getTimestampedFrame() -> TimestampedFrame {
         TimestampedFrame tframe;
         mCameraCapture.read(tframe.frame);
