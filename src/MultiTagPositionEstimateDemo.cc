@@ -14,8 +14,24 @@
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
 #include <cmath>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/types.hpp>
 #include <opencv2/core/version.hpp>
 #include <chrono>
+#include <thread>
+#include <frc/smartdashboard/Field2d.h>
+#include <networktables/NetworkTableInstance.h>
+#include <ntcore_cpp.h>
+
+namespace {
+auto PumpGuiEventsAndGetKey() -> int {
+#if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
+    return cv::pollKey();
+#else
+    return cv::waitKey(1);
+#endif
+}
+}
 
 auto main() -> int {
     int camid;
@@ -42,6 +58,9 @@ auto main() -> int {
 
     auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, cameraMatrix, distCoeffs);
 
+    const std::string windowName = "AprilTag Detection Demo";
+    cv::namedWindow(windowName, cv::WINDOW_NORMAL);
+
     int count = 0;
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -57,5 +76,13 @@ auto main() -> int {
         }
         count++;
 
+        cv::Mat image = cv::imread("./image.png");
+        auto point = cv::Point2d(-(pose[0].position.Y().value() / 16.540988) * image.cols, (-pose[0].position.Z().value() / 8.069326) * tframe.frame.rows);
+        cv::circle(image, point, 15, cv::Scalar(0, 0, 255), -1);
+
+        cv::imshow(windowName, image);
+        if (PumpGuiEventsAndGetKey() == 'q') {
+            break;
+        }
     }
 }
