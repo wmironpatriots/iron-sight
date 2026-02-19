@@ -1,11 +1,12 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// File: CvAprilTagSearcherDemo.cc
-// Purpose: Demo for MultiTagPositionEstimator
+// File: MultiTagEstimationDemo
+// Purpose: Showcase position estimation using multiple tags
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
+// TODO cleanup
 
 #include <frc/apriltag/AprilTagFields.h>
 #include "src/camera/Camera.h"
@@ -76,7 +77,7 @@ auto main() -> int {
         }
         count++;
 
-        cv::Mat image = cv::imread("./image.png");
+        cv::Mat image = cv::imread("./resources/field.png");
         auto point = cv::Point2d(-(pose[0].position.Y().value() / 16.540988) * image.cols, (-pose[0].position.Z().value() / 8.069326) * tframe.frame.rows);
         cv::circle(image, point, 15, cv::Scalar(0, 0, 255), -1);
 
