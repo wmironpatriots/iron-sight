@@ -13,6 +13,8 @@ namespace camera {
         mConfig = config;
         mCameraCapture = cv::VideoCapture(config.deviceId, config.apiId);
         mCameraCapture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
+        mCameraCapture.set(cv::CAP_PROP_FRAME_WIDTH, 800);
+        mCameraCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 600);
         // Check if stream connected to camera
         if (!mCameraCapture.isOpened()) {
             printf("Error ~ Failed to open camera\n");

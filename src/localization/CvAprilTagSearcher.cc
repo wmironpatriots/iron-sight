@@ -17,13 +17,10 @@ namespace localization {
         td->quad_decimate = 2.0;
         td->quad_sigma = 0.0;
         td->nthreads = 4;
+        td->refine_edges = false;
     };
 
     auto CvAprilTagSearcher::findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {
-        apriltag_detector_add_family(td, tf);
-        td->quad_decimate = 2.0;
-        td->quad_sigma = 0.0;
-        td->nthreads = 4;
         cv::Mat framec = tframe.frame;
         cv::Mat frame;
         cv::cvtColor(framec, frame, cv::COLOR_BGR2GRAY);
@@ -54,6 +51,11 @@ namespace localization {
     CvAprilTagSearcher::~CvAprilTagSearcher() {
         if (td != nullptr) {
             apriltag_detector_destroy(td);
+            td = nullptr;
+        }
+        if (tf != nullptr) {
+            tag36h11_destroy(tf);
+            tf = nullptr;
         }
     }
 }
