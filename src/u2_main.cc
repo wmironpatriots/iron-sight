@@ -2,5 +2,5 @@
 
 /** Represents the program for the side cams unit */
 auto main() -> int {
-    return 0;
+  return 0;
 }
