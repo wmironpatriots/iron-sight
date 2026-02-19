@@ -57,6 +57,11 @@ namespace localization {
         return frc::Pose3d{trans, rot};
     }
     auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
+        if (found_tags.empty()){
+            std::vector<pose3d_estimate_t> estimates{}; 
+            estimates.emplace_back(pose3d_estimate_t(frc::Pose3d(), 0, 0));
+            return estimates;
+        }
         std::vector<cv::Point2d> imagePoints;
         for (found_apriltag_t tag : found_tags){
             for (int i = 0; i < 4; i++){
@@ -68,10 +73,13 @@ namespace localization {
         double half = tag_size/2;
         for (found_apriltag_t tag : found_tags){
             // this assumes that the tag exists in the field, will crash if it doesnt. cry about it. loop above also needs to be fixed, as the two need to match 1:1
+            //std::cerr << "tag found! \n";
             frc::Pose3d tagPose = fieldLayout.GetTagPose(tag.tag_id).value();
+            //std::cerr << "debug \n";
             double x = tagPose.X().value();
             double y = tagPose.Y().value();
             double z = tagPose.Z().value();
+            //std::cerr << x << " " << y << " " << z << "\n";
             objectPoints.emplace_back(x-half, y+half, z);
             objectPoints.emplace_back(x+half, y+half, z);
             objectPoints.emplace_back(x-half, y-half, z);
@@ -79,13 +87,14 @@ namespace localization {
         }
         cv::Mat rvec, tvec;
         //TODO there are other methods than SQPNP, try them later
-        cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
+        cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, true, cv::SOLVEPNP_EPNP);
         
         double timestamp = 0.0;
         if (!found_tags.empty()){
             timestamp = found_tags[0].timestampSeconds;
         }
         std::vector<pose3d_estimate_t> estimates{}; 
+        //std::cerr << rvec << tvec;
         estimates.emplace_back(pose3d_estimate_t(OpencvRvecTvec2WpilibPose3d(rvec, tvec), timestamp, 0));
         return estimates;
     }

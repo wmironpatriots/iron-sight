@@ -49,10 +49,10 @@ auto main() -> int {
         auto detections = searcher.findTags(tframe);
         auto pose = poseEstimator.estimatePosition(detections);
         timer.Stop();
-        if (count >= 100){
+        if (count >= 30){
             units::second_t time = timer.Get();
             std::cerr << "FPS: " << 1/time.value() << "\n";
-            std::cerr << pose[0].position.X().value() << " " << pose[0].position.Y().value();
+            std::cerr << pose[0].position.X().value() << " " << pose[0].position.Y().value() << " " << pose[0].position.Z().value() << "\n";
             count = 0;
         }
         count++;
