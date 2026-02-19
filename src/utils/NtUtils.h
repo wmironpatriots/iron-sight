@@ -7,6 +7,6 @@
 #include "src/utils/PCH.h"
 
 namespace utils {
-/** Start networktables connction */
-void StartNetworkTables();
-}  // namespace utils
+    /** Start networktables connction */
+    void StartNetworkTables();
+}
