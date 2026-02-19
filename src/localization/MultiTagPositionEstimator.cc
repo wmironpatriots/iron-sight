@@ -87,7 +87,7 @@ namespace localization {
         }
         cv::Mat rvec, tvec;
         //TODO there are other methods than SQPNP, try them later
-        cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, true, cv::SOLVEPNP_EPNP);
+        cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, true, cv::SOLVEPNP_SQPNP);
         
         double timestamp = 0.0;
         if (!found_tags.empty()){

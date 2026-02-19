@@ -15,7 +15,7 @@
 #include "src/localization/MultiTagPositionEstimator.h"
 #include <cmath>
 #include <opencv2/core/version.hpp>
-#include <frc/Timer.h>
+#include <chrono>
 
 auto main() -> int {
     int camid;
@@ -41,21 +41,21 @@ auto main() -> int {
     cv::Mat distCoeffs = cv::Mat::zeros(5, 1, CV_64F);
 
     auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, cameraMatrix, distCoeffs);
-    frc::Timer timer;
+
     int count = 0;
     while (true) {
-        timer.Start();
+        auto start = std::chrono::high_resolution_clock::now();
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
         auto pose = poseEstimator.estimatePosition(detections);
-        timer.Stop();
-        if (count >= 30){
-            units::second_t time = timer.Get();
-            std::cerr << "FPS: " << 1/time.value() << "\n";
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = end - start;
+        if (count >= 5){
+            std::cerr << "FPS: " << 1/elapsed.count() << "\n";
             std::cerr << pose[0].position.X().value() << " " << pose[0].position.Y().value() << " " << pose[0].position.Z().value() << "\n";
             count = 0;
         }
         count++;
-        timer.Reset();
+
     }
 }
