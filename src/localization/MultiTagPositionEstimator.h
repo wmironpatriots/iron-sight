@@ -16,7 +16,7 @@ namespace localization {
     /** Represents a PositionEstimator that solves based on many found tags */
     class MultiTagPositionEstimator : IPositionEstimator {
         public:
-            MultiTagPositionEstimator(const frc::AprilTagFieldLayout& fieldLayout, const cv::Mat& cameraMatrix, const cv::Mat& distCoeffs);
+            MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, cv::Mat cameraMatrix, cv::Mat distCoeffs);
             auto OpencvRvecTvec2WpilibPose3d(cv::Mat& rvec, cv::Mat& tvec) -> frc::Pose3d;
             auto estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> override;
         private:

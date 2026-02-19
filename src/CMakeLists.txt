@@ -28,4 +28,8 @@ target_link_directories(u2 PRIVATE ${OpenCV_LIBS} apriltag ntcore nlohmann_json:
 add_executable(cvapriltagsearcher_demo CvAprilTagSearcherDemo.cc)
 target_link_libraries(cvapriltagsearcher_demo PRIVATE ${OpenCV_LIBS} wpilibc apriltag ntcore localization camera utils)
 
+# Demo executable for MultiTagPositionEstimator
+add_executable(multitagpositionestimater_demo MultiTagPositionEstimateDemo.cc)
+target_link_libraries(multitagpositionestimater_demo PRIVATE ${OpenCV_LIBS} wpilibc apriltag ntcore localization camera utils)
+
 set(CMAKE_CXX_CLANG_TIDY "")

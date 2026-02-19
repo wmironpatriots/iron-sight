@@ -18,7 +18,10 @@
 #include <frc/Timer.h>
 
 auto main() -> int {
-    camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_V4L2));
+    int camid;
+    std::cout <<"Enter CamID: ";
+    std::cin >> camid;
+    camera::CameraCv camera(camera::CameraConfig(camid, cv::CAP_V4L2));
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 

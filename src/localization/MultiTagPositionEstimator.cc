@@ -12,17 +12,18 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/calib3d.hpp>
 #include <Eigen/Geometry>
+#include <utility>
 #include <vector>
 #include "src/localization/AprilTagSearcher.h"
 #include "src/localization/PositionEstimator.h"
 
 namespace localization {
-    MultiTagPositionEstimator::MultiTagPositionEstimator(const frc::AprilTagFieldLayout& fieldLayout, 
-                                                        const cv::Mat& cameraMatrix, 
-                                                        const cv::Mat& distCoeffs) 
-                                                        : fieldLayout(fieldLayout),
-                                                        cameraMatrix(cameraMatrix),
-                                                        distCoeffs(distCoeffs) {};
+    MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout,
+                                                        cv::Mat cameraMatrix,
+                                                        cv::Mat distCoeffs)
+                                                        : fieldLayout(std::move(fieldLayout)),
+                                                        cameraMatrix(std::move(cameraMatrix)),
+                                                        distCoeffs(std::move(distCoeffs)) {};
     auto MultiTagPositionEstimator::OpencvRvecTvec2WpilibPose3d(cv::Mat& rvec, cv::Mat& tvec) -> frc::Pose3d {
         //copied code, i have no idea how ts works
         cv::Mat Rcv;
@@ -71,16 +72,16 @@ namespace localization {
             double x = tagPose.X().value();
             double y = tagPose.Y().value();
             double z = tagPose.Z().value();
-            objectPoints.emplace_back(cv::Point3d(x-half, y+half, z));
-            objectPoints.emplace_back(cv::Point3d(x+half, y+half, z));
-            objectPoints.emplace_back(cv::Point3d(x-half, y-half, z));
-            objectPoints.emplace_back(cv::Point3d(x-half, y-half, z));
+            objectPoints.emplace_back(x-half, y+half, z);
+            objectPoints.emplace_back(x+half, y+half, z);
+            objectPoints.emplace_back(x-half, y-half, z);
+            objectPoints.emplace_back(x+half, y-half, z);
         }
         cv::Mat rvec, tvec;
         //TODO there are other methods than SQPNP, try them later
         cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
         
-        double timestamp = NULL;
+        double timestamp = 0.0;
         if (!found_tags.empty()){
             timestamp = found_tags[0].timestampSeconds;
         }
