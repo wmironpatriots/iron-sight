@@ -15,12 +15,12 @@ auto main() -> int {
 
   camera::CameraCv cam(config);
   while (true) {
-    camera::TimestampedFrame ts = cam.getTimestampedFrame();
+    camera::TimestampedFrame tframe = cam.getTimestampedFrame();
 
-    if (!ts.frame.empty()) {
+    if (!tframe.frame.empty()) {
       const std::string path =
-          img_dir + std::to_string(ts.timestamp.value()) + ".png";
-      cv::imwrite(path);
+          img_dir + std::to_string(tframe.timestamp.value()) + ".png";
+      cv::imwrite(path, tframe.frame);
       std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
   }
