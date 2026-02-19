@@ -1,3 +1,12 @@
+// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
+// https://github.com/wmironpatriots
+//
+// File: ModuleConstants.h
+// Purpose: Define yolo config structs
+//
+// Open Source Software; you can modify and/or share it under the terms of
+// MIT license file in the root directory of this project
+
 #include <chrono>
 #include <filesystem>
 #include <opencv2/opencv.hpp>
