@@ -79,15 +79,14 @@ namespace localization {
                     imagePoints.emplace_back(tag.cornerCoords[i]);
                 }
 
-                frc::Pose3d tagPose = fieldLayout.GetTagPose(tag.tag_id).value();
+                auto cvTagPose = frc::CoordinateSystem::Convert(fieldLayout.GetTagPose(tag.tag_id).value(), frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
 
                 for (auto pose : kTagCorners) {
-                    auto wpilibTransform = frc::Transform3d(tagPose.Translation(), tagPose.Rotation());
-                    auto cvTransform = frc::CoordinateSystem::Convert(wpilibTransform, frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
+                    auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
 
-                    auto transformed = pose.TransformBy(cvTransform);
+                    auto cornerPose = pose.TransformBy(cornerTransform);
 
-                    objectPoints.emplace_back(transformed.Y().value(), transformed.Y().value(), transformed.Z().value());
+                    objectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                 }
 
             } else {
@@ -112,7 +111,7 @@ namespace localization {
         Eigen::Vector3d R(rvec.at<double>(0), rvec.at<double>(1), rvec.at<double>(2));
         auto rotation = frc::Rotation3d(R, units::angle::radian_t{R.norm()});
 
-        auto cvFieldToCamera = frc::Transform3d(translation, rotation);
+        auto cvFieldToCamera = frc::Transform3d(translation, rotation).Inverse();
         auto wpilibFieldToCamera = frc::CoordinateSystem::Convert(cvFieldToCamera, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
 
         auto pose = frc::Pose3d().TransformBy(wpilibFieldToCamera);

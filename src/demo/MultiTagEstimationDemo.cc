@@ -82,9 +82,9 @@ auto main() -> int {
         if (count >= 1){
             std::system("clear");
             std::cerr << "FPS: " << 1/elapsed.count() << "\n";
-            std::cerr << pose[0].position.X().value()*39.37 << "\n";
-            std::cerr << pose[0].position.Y().value()*39.37 << "\n"; 
-            std::cerr << pose[0].position.Z().value()*39.37 << "\n";
+            std::cerr << pose[0].position.X().value() << "\n";
+            std::cerr << pose[0].position.Y().value() << "\n"; 
+            std::cerr << pose[0].position.Z().value() << "\n";
             count = 0;
             
         }
