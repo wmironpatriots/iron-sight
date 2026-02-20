@@ -8,6 +8,7 @@
 // MIT license file in the root directory of this project
 #pragma once
 
+#include <opencv2/core/mat.hpp>
 #include "src/camera/Camera.h"
 #include "src/camera/CameraConfig.h"
 
@@ -20,6 +21,7 @@ namespace camera {
             auto getTimestampedFrame() -> TimestampedFrame override;
         private:
             CameraConfig mConfig;
+            cv::Mat mBackupImg;
             cv::VideoCapture mCameraCapture;
     };
 }

@@ -7,6 +7,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #include "src/camera/CameraCv.h"
+#include <opencv2/core/types.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 
 namespace camera {
     CameraCv::CameraCv(const CameraConfig& config) {
@@ -20,7 +23,9 @@ namespace camera {
         std::string codec = config.codec;
         mCameraCapture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(codec[0], codec[1], codec[2], codec[3]));
 
-        // Check if stream connected to camera
+        mBackupImg = cv::imread("./resources/bessie.png");
+        cv::resize(mBackupImg, mBackupImg, cv::Size(config.captureWidth, config.captureHeight));
+
         if (!mCameraCapture.isOpened()) {
             printf("Error ~ Failed to open camera\n");
             throw;
@@ -30,12 +35,17 @@ namespace camera {
     auto CameraCv::getFrame() -> cv::Mat {
         cv::Mat frame;
         mCameraCapture.read(frame);
+
+        if (frame.empty()) {
+            frame = mBackupImg;
+        }
+
         return frame;
     }
 
     auto CameraCv::getTimestampedFrame() -> TimestampedFrame {
         TimestampedFrame tframe;
-        mCameraCapture.read(tframe.frame);
+        tframe.frame = getFrame();
         tframe.timestamp = frc::Timer::GetFPGATimestamp();
 
         return tframe;

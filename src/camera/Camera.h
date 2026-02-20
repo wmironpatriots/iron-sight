@@ -23,11 +23,9 @@ namespace camera {
     class Camera {
         public:
             virtual ~Camera() = default;
-            /** @return dense matrix representing raw recorded frame */
+            /** return dense matrix representing raw recorded frame */
             virtual auto getFrame() -> cv::Mat = 0;
             /** returns TimestampedFrame representing the frame recorded at a specific timestamp*/
             virtual auto getTimestampedFrame() -> TimestampedFrame = 0;
-        private:
-            cv::VideoCapture mCapture;
     };
 }
