@@ -9,6 +9,7 @@
 #pragma once
 
 #include "src/camera/Camera.h"
+#include "src/camera/CameraConfig.h"
 
 namespace camera {
     /** CameraIO implementation for openCV cam */
