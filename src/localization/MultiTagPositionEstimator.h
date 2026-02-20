@@ -21,6 +21,8 @@ namespace localization {
     /** Generate Distance Coefficents Matrix from config */
     auto generateDistCoeffs(const camera::CameraConfig& config) -> cv::Mat;
 
+    auto ConvertOpencvRvecTvecToWpiLibTransform(cv::Mat rvec, cv::Mat tvec) -> frc::Transform3d;
+
     /** Represents a PositionEstimator that solves based on many found tags */
     class MultiTagPositionEstimator : IPositionEstimator {
         public:

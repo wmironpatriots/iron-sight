@@ -35,6 +35,19 @@
 #include "units/length.h"
 
 namespace localization {
+
+    auto ConvertOpencvRvecTvecToWpiLibTransform(cv::Mat rvec, cv::Mat tvec) -> frc::Transform3d {
+        Eigen::Vector3d T(tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2));
+        auto translation = frc::Translation3d(T);
+
+        Eigen::Vector3d R(rvec.at<double>(0), rvec.at<double>(1), rvec.at<double>(2));
+        auto rotation = frc::Rotation3d(R, units::angle::radian_t{R.norm()});
+
+        auto cvFieldToCamera = frc::Transform3d(translation, rotation).Inverse();
+        auto wpilibFieldToCamera = frc::CoordinateSystem::Convert(cvFieldToCamera, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
+        return wpilibFieldToCamera;
+    }
+    
     auto generateCameraMatrix(const camera::CameraConfig& config) -> cv::Mat {
         auto intrinsics = config.intrinsicsCalibration;
         cv::Mat matrix = (cv::Mat_<double>(3, 3) <<
@@ -59,23 +72,20 @@ namespace localization {
                                                         cameraMatrix(generateCameraMatrix(cameraConfig)),
                                                         distCoeffs(generateDistCoeffs(cameraConfig)) {};
 
-    auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
-        if (found_tags.empty()){
-
-            std::vector<pose3d_estimate_t> estimates{}; 
-            estimates.emplace_back(pose3d_estimate_t(frc::Pose3d(), 0, 0));
-            return estimates;
-
-        }
+    
+        auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
+        std::vector<pose3d_estimate_t> estimates{};
 
         std::vector<cv::Point2d> imagePoints;
         std::vector<cv::Point3d> objectPoints;
 
         for (found_apriltag_t tag : found_tags){
-
+            std::vector<cv::Point2d> singleTagImagePoints{};
+            std::vector<cv::Point3d> singleTagObjectPoints{};
             if (fieldLayout.GetTagPose(tag.tag_id) != std::nullopt){
 
                 for (int i = 0; i < 4; i++){
+                    singleTagImagePoints.emplace_back(tag.cornerCoords[i]);
                     imagePoints.emplace_back(tag.cornerCoords[i]);
                 }
 
@@ -85,10 +95,15 @@ namespace localization {
                     auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
 
                     auto cornerPose = pose.TransformBy(cornerTransform);
-
+                    singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                     objectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                 }
+                cv::Mat singleTagRvec, singleTagTvec;
+                cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, singleTagRvec, singleTagTvec, false, cv::SOLVEPNP_IPPE_SQUARE);
+                
+                auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(singleTagRvec, singleTagTvec));
 
+                estimates.emplace_back(pose3d_estimate_t(pose, tag.timestampSeconds, 1));
             } else {
 
                 std::cerr << "Invalid AprilTag ID found! \n";
@@ -96,27 +111,14 @@ namespace localization {
             }
 
         }
-
+        if (objectPoints.empty() && imagePoints.empty()){
+            return {};
+        }
         cv::Mat rvec, tvec;
         cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
-        
+        auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(rvec, rvec));
         double timestamp = 0.0;
-        if (!found_tags.empty()){
-            timestamp = found_tags[0].timestampSeconds;
-        }
-
-        Eigen::Vector3d T(tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2));
-        auto translation = frc::Translation3d(T);
-
-        Eigen::Vector3d R(rvec.at<double>(0), rvec.at<double>(1), rvec.at<double>(2));
-        auto rotation = frc::Rotation3d(R, units::angle::radian_t{R.norm()});
-
-        auto cvFieldToCamera = frc::Transform3d(translation, rotation).Inverse();
-        auto wpilibFieldToCamera = frc::CoordinateSystem::Convert(cvFieldToCamera, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
-
-        auto pose = frc::Pose3d().TransformBy(wpilibFieldToCamera);
-
-        std::vector<pose3d_estimate_t> estimates{}; 
+        timestamp = found_tags[0].timestampSeconds;
         estimates.emplace_back(pose3d_estimate_t(pose, timestamp, 1));
 
         return estimates;
