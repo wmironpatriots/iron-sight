@@ -27,9 +27,11 @@ auto PumpGuiEventsAndGetKey() -> int {
 }
 }
 
-//demo made from a lot of chatgpt bc i cant be bothered to make this myself
 auto main() -> int {
-    camera::CameraCv camera(camera::CameraConfig(2, cv::CAP_V4L2));
+    int camid;
+    std::cout << "Enter camid: ";
+    std::cin >> camid;
+    camera::CameraCv camera(camera::CameraConfig(camid, cv::CAP_V4L2, "MJPG", 800, 600, 100));
     localization::CvAprilTagSearcher searcher;
 
     const std::string windowName = "AprilTag Detection Demo";

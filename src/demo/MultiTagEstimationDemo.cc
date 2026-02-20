@@ -23,6 +23,7 @@
 #include <frc/smartdashboard/Field2d.h>
 #include <networktables/NetworkTableInstance.h>
 #include <ntcore_cpp.h>
+#include <cstdlib>
 
 namespace {
 auto PumpGuiEventsAndGetKey() -> int {
@@ -38,12 +39,12 @@ auto main() -> int {
     int camid;
     std::cout <<"Enter CamID: ";
     std::cin >> camid;
-    camera::CameraCv camera(camera::CameraConfig(camid, cv::CAP_V4L2));
+    camera::CameraCv camera(camera::CameraConfig(camid, cv::CAP_V4L2, "MJPG", 800, 600, 100));
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
-    int width = 1280;
-    int height = 720;
+    int width = 800;
+    int height = 600;
 
     double fx = width;
     double fy = width;
@@ -70,15 +71,19 @@ auto main() -> int {
         auto pose = poseEstimator.estimatePosition(detections);
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
-        if (count >= 5){
+        if (count >= 1){
+            std::system("clear");
             std::cerr << "FPS: " << 1/elapsed.count() << "\n";
-            std::cerr << pose[0].position.X().value() << " " << pose[0].position.Y().value() << " " << pose[0].position.Z().value() << "\n";
+            std::cerr << pose[0].position.X().value()*39.37 << "\n";
+            std::cerr << pose[0].position.Y().value()*39.37 << "\n"; 
+            std::cerr << pose[0].position.Z().value()*39.37 << "\n";
             count = 0;
+            
         }
         count++;
 
         cv::Mat image = cv::imread("./resources/field.png");
-        auto point = cv::Point2d(-(pose[0].position.Y().value() / 16.540988) * image.cols, (-pose[0].position.Z().value() / 8.069326) * tframe.frame.rows);
+        auto point = cv::Point2d((pose[0].position.X().value() / 16.540988) * image.cols, (pose[0].position.Y().value() / 8.069326) * tframe.frame.rows);
         cv::circle(image, point, 15, cv::Scalar(0, 0, 255), -1);
 
         cv::imshow(windowName, image);
