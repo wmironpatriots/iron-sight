@@ -10,6 +10,7 @@
 
 #include <frc/apriltag/AprilTagFields.h>
 #include "src/camera/Camera.h"
+#include "src/camera/CameraConfig.h"
 #include "src/camera/CameraCv.h"
 #include "src/camera/CameraStream.h"
 #include "src/localization/CvAprilTagSearcher.h"
@@ -37,10 +38,8 @@ auto PumpGuiEventsAndGetKey() -> int {
 }
 
 auto main() -> int {
-    int camid;
-    std::cout <<"Enter CamID: ";
-    std::cin >> camid;
-    camera::CameraCv camera(camera::CameraConfig(camid, cv::CAP_V4L2, "MJPG", 800, 600, 100));
+    camera::CameraCv camera(camera::kMultiTagDemoCam);
+
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 

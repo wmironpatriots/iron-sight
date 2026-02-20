@@ -71,6 +71,7 @@ namespace localization {
         }
 
         cv::Mat rvec, tvec;
+        cv::Mat R, T;
         cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
         
         double timestamp = 0.0;
@@ -78,15 +79,15 @@ namespace localization {
             timestamp = found_tags[0].timestampSeconds;
         }
         
-        units::length::meter_t x{tvec.at<double>(0, 0)};
-        units::length::meter_t y{tvec.at<double>(1, 0)};
-        units::length::meter_t z{tvec.at<double>(2, 0)};
+        units::length::meter_t x{-tvec.at<double>(2)};
+        units::length::meter_t y{tvec.at<double>(0)};
+        units::length::meter_t z{-tvec.at<double>(1)};
         auto translation = frc::Translation3d(x, y, z);
 
-        Eigen::Vector3d vec(rvec.at<double>(0, 0), rvec.at<double>(1, 0), rvec.at<double>(2, 0));
-        auto rotation = frc::Rotation3d(vec, units::angle::radian_t{cv::norm(rvec)});
+        Eigen::Vector3d vec(-rvec.at<double>(2), rvec.at<double>(0), -rvec.at<double>(1));
+        auto rotation = frc::Rotation3d(vec, units::angle::radian_t{vec.norm()});
 
-        auto cvFieldToCamm = frc::Transform3d(translation, rotation).Inverse();
+        auto cvFieldToCamm = frc::Transform3d(translation, rotation);
         auto wpilibFieldToCam = frc::CoordinateSystem::Convert(cvFieldToCamm, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
 
         std::vector<pose3d_estimate_t> estimates{}; 

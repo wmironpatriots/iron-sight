@@ -48,7 +48,7 @@ namespace camera {
         camera_intrinsics_t intrinsicsCalibration;
     };
 
-    inline const camera_config_t multitagDemoCamera = camera_config_t{
+    inline const camera_config_t kMultiTagDemoCam = camera_config_t{
         2,
         cv::CAP_V4L2,
         "MJPG",
