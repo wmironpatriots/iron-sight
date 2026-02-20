@@ -17,6 +17,14 @@ namespace camera {
         int deviceId;
         /** API backend to use */
         int apiId;
+        /** Codec to use */
+        std::string codec;
+        /** Height of capture*/
+        int captureHeight;
+        /** Width of capture */
+        int captureWidth;
+        /** FPS of capture */
+        int captureFPS;
     };
 
     /** Represents a camera frame recorded at a specified timestamp */

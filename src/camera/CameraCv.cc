@@ -12,9 +12,11 @@ namespace camera {
     CameraCv::CameraCv(const CameraConfig& config) {
         mConfig = config;
         mCameraCapture = cv::VideoCapture(config.deviceId, config.apiId);
-        mCameraCapture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
-        mCameraCapture.set(cv::CAP_PROP_FRAME_WIDTH, 800);
-        mCameraCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 600);
+        mCameraCapture.set(cv::CAP_PROP_FRAME_WIDTH, config.captureWidth);
+        mCameraCapture.set(cv::CAP_PROP_FRAME_HEIGHT, config.captureHeight); 
+        mCameraCapture.set(cv::CAP_PROP_FPS, config.captureFPS);
+        std::string codec = config.codec;
+        mCameraCapture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(codec[0], codec[1], codec[2], codec[3]));
         // Check if stream connected to camera
         if (!mCameraCapture.isOpened()) {
             printf("Error ~ Failed to open camera\n");
