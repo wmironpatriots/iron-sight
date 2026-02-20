@@ -114,7 +114,7 @@ namespace localization {
         auto rotation = frc::Rotation3d(vec, units::angle::radian_t{vec.norm()});
 
         // TODO fieldToChassis using cameraWrtChassis
-        auto fieldToCam = frc::Transform3d(translation, rotation).Inverse();
+        auto fieldToCam = frc::Transform3d(translation, rotation);
 
         std::vector<pose3d_estimate_t> estimates{}; 
         auto pose = frc::Pose3d();

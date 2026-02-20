@@ -45,10 +45,10 @@ namespace camera {
         int apiId;
         /** Codec to use */
         std::string codec;
-        /** Height of capture*/
-        int captureHeight;
         /** Width of capture */
         int captureWidth;
+        /** Height of capture*/
+        int captureHeight;
         /** FPS of capture */
         int captureFPS;
         /** Represents the displacement of camera WRT chassis center */
