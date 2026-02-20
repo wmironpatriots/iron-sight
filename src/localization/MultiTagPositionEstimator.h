@@ -10,18 +10,25 @@
 
 #include <frc/geometry/Transform3d.h>
 #include <opencv2/core/mat.hpp>
+#include "src/camera/CameraConfig.h"
 #include "src/localization/PositionEstimator.h"
 #include "apriltag/frc/apriltag/AprilTagFieldLayout.h"
 
 namespace localization {
-    // TODO
+    /** Generate Camera Matrix from config */
+    auto generateCameraMatrix(const camera::CameraConfig& config) -> cv::Mat;
+
+    /** Generate Distance Coefficents Matrix from config */
+    auto generateDistCoeffs(const camera::CameraConfig& config) -> cv::Mat;
+
     /** Represents a PositionEstimator that solves based on many found tags */
     class MultiTagPositionEstimator : IPositionEstimator {
         public:
-            MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, cv::Mat cameraMatrix, cv::Mat distCoeffs);
+            MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig);
             auto estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> override;
         private:
             frc::AprilTagFieldLayout fieldLayout;
+            frc::Transform3d cameraWrtChassis;
             cv::Mat cameraMatrix;
             cv::Mat distCoeffs;
     };

@@ -9,24 +9,31 @@
 #pragma once
 
 #include <frc/geometry/Rotation3d.h>
+#include <frc/geometry/Transform3d.h>
+#include <opencv2/core/types.hpp>
 #include <opencv2/videoio.hpp>
 #include "src/utils/PCH.h"
 
 namespace camera {
-    using camera_extrinsics_t = struct CameraExtrinsicsCalibration {
-        frc::Translation3d positionalDisplacement;
-        frc::Rotation3d rotationalDisplacement;
-    };
-
+    /** Represent the internal characteristics of a camera */
     using camera_intrinsics_t = struct CameraIntrinsics {
+        /** Optical Center X coord in Pixels */
         double cx;
+        /** Optical Center Y coord in Pixels */
         double cy;
+        /** Focal X Length in Pixels */
         double fx;
+        /** Focal Y Length in Pixels */
         double fy;
+        /** Radial Distortion Coefficent 1 */
         double k1;
+        /** Radial Distortion Coefficent 2 */
         double k2;
+        /** Radial Distortion Coefficent 3 */
         double k3;
+        /** Pixel size in Meters */
         double p1;
+        /** Pixel size in Meters */
         double p2;
     };
 
@@ -44,31 +51,9 @@ namespace camera {
         int captureWidth;
         /** FPS of capture */
         int captureFPS;
-        camera_extrinsics_t extrinsicsCalibration;
+        /** Represents the displacement of camera WRT chassis center */
+        frc::Transform3d transformWrtChassis;
+        /** The internal characteristics of camera */
         camera_intrinsics_t intrinsicsCalibration;
-    };
-
-    inline const camera_config_t kMultiTagDemoCam = camera_config_t{
-        2,
-        cv::CAP_V4L2,
-        "MJPG",
-        800,
-        600,
-        100,
-        camera_extrinsics_t{
-            frc::Translation3d(),
-            frc::Rotation3d()
-        },
-        camera_intrinsics_t{
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        }
     };
 }

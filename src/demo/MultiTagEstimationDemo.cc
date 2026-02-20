@@ -37,28 +37,34 @@ auto PumpGuiEventsAndGetKey() -> int {
 }
 }
 
+inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
+    2,
+    cv::CAP_V4L2,
+    "MJPG",
+    800,
+    600,
+    100,
+    frc::Transform3d(),
+    camera::camera_intrinsics_t{
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    }
+};
+
 auto main() -> int {
-    camera::CameraCv camera(camera::kMultiTagDemoCam);
+    camera::CameraCv camera(kDemoCam);
 
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
-    int width = 800;
-    int height = 600;
-
-    double fx = width;
-    double fy = width;
-    double cx = width / 2.0;
-    double cy = height / 2.0;
-
-    cv::Mat cameraMatrix = (cv::Mat_<double>(3,3) <<
-        fx, 0,  cx,
-        0,  fy, cy,
-        0,  0,  1);
-
-    cv::Mat distCoeffs = cv::Mat::zeros(5, 1, CV_64F);
-
-    auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, cameraMatrix, distCoeffs);
+    auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, kDemoCam);
 
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);

@@ -18,6 +18,8 @@
 #include <units/angle.h>
 #include <units/length.h>
 #include <Eigen/Core>
+#include <iterator>
+#include <numeric>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core/types.hpp>
@@ -25,23 +27,42 @@
 #include <Eigen/Geometry>
 #include <utility>
 #include <vector>
+#include "src/camera/CameraConfig.h"
 #include "src/localization/AprilTagSearcher.h"
 #include "src/localization/PositionEstimator.h"
 #include "units/length.h"
 
 namespace localization {
-    MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout,
-                                                        cv::Mat cameraMatrix,
-                                                        cv::Mat distCoeffs)
+    auto generateCameraMatrix(const camera::CameraConfig& config) -> cv::Mat {
+        auto intrinsics = config.intrinsicsCalibration;
+        cv::Mat matrix = (cv::Mat_<double>(3, 3) <<
+            intrinsics.fx, 0,             intrinsics.cx,
+            0,             intrinsics.fy, intrinsics.cy,
+            0,             0,             1);
+
+        return matrix;
+    }
+
+    auto generateDistCoeffs(const camera::CameraConfig& config) -> cv::Mat {
+        auto intrinsics = config.intrinsicsCalibration;
+        cv::Mat matrix = (cv::Mat_<double>(1, 5) <<
+            intrinsics.k1, intrinsics.k2, intrinsics.p1, intrinsics.p2, intrinsics.k3);
+
+        return matrix;
+    }
+
+    MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig)
                                                         : fieldLayout(std::move(fieldLayout)),
-                                                        cameraMatrix(std::move(cameraMatrix)),
-                                                        distCoeffs(std::move(distCoeffs)) {};
+                                                        cameraMatrix(generateCameraMatrix(cameraConfig)),
+                                                        distCoeffs(generateDistCoeffs(cameraConfig)) {};
 
     auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
         if (found_tags.empty()){
+
             std::vector<pose3d_estimate_t> estimates{}; 
             estimates.emplace_back(pose3d_estimate_t(frc::Pose3d(), 0, 0));
             return estimates;
+
         }
 
         std::vector<cv::Point2d> imagePoints;
@@ -79,21 +100,23 @@ namespace localization {
             timestamp = found_tags[0].timestampSeconds;
         }
         
-        units::length::meter_t x{-tvec.at<double>(2)};
-        units::length::meter_t y{tvec.at<double>(0)};
+        units::length::meter_t x{tvec.at<double>(2)};
+        units::length::meter_t y{-tvec.at<double>(0)};
         units::length::meter_t z{-tvec.at<double>(1)};
         auto translation = frc::Translation3d(x, y, z);
 
-        Eigen::Vector3d vec(-rvec.at<double>(2), rvec.at<double>(0), -rvec.at<double>(1));
+        Eigen::Vector3d vec(
+            rvec.at<double>(2), 
+            -rvec.at<double>(0), 
+            -rvec.at<double>(1));
         auto rotation = frc::Rotation3d(vec, units::angle::radian_t{vec.norm()});
 
-        auto cvFieldToCamm = frc::Transform3d(translation, rotation);
-        auto wpilibFieldToCam = frc::CoordinateSystem::Convert(cvFieldToCamm, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
+        auto fieldToCam = frc::Transform3d(translation, rotation).Inverse();
 
         std::vector<pose3d_estimate_t> estimates{}; 
         auto pose = frc::Pose3d();
 
-        estimates.emplace_back(pose3d_estimate_t(pose.TransformBy(wpilibFieldToCam), timestamp, 0));
+        estimates.emplace_back(pose3d_estimate_t(pose.TransformBy(fieldToCam), timestamp, 0));
 
         return estimates;
     }
