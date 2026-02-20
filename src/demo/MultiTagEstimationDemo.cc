@@ -96,7 +96,7 @@ auto main() -> int {
 
         
             for (auto position : pose) {
-                auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * tframe.frame.rows);
+                auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
                 cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
             }
         }

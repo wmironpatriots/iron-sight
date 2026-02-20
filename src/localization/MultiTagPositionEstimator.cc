@@ -117,7 +117,7 @@ namespace localization {
         }
         cv::Mat rvec, tvec;
         cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
-        auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(rvec, rvec));
+        auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec));
         double timestamp = 0.0;
         timestamp = found_tags[0].timestampSeconds;
         estimates.emplace_back(pose3d_estimate_t(pose, timestamp, 1));
