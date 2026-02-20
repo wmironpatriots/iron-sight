@@ -14,6 +14,7 @@
 #include <frc/geometry/Rotation3d.h>
 #include <frc/geometry/Transform3d.h>
 #include <frc/geometry/Translation3d.h>
+#include <frc/geometry/Twist3d.h>
 #include <opencv2/core/hal/interface.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -25,6 +26,7 @@
 #include <opencv2/core/types.hpp>
 #include <opencv2/calib3d.hpp>
 #include <Eigen/Geometry>
+#include <optional>
 #include <utility>
 #include <vector>
 #include "src/camera/CameraConfig.h"
@@ -53,6 +55,7 @@ namespace localization {
 
     MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig)
                                                         : fieldLayout(std::move(fieldLayout)),
+                                                        cameraWrtChassis(cameraConfig.transformWrtChassis),
                                                         cameraMatrix(generateCameraMatrix(cameraConfig)),
                                                         distCoeffs(generateDistCoeffs(cameraConfig)) {};
 
@@ -70,7 +73,7 @@ namespace localization {
 
         for (found_apriltag_t tag : found_tags){
 
-            if (fieldLayout.GetTagPose(tag.tag_id).has_value()){
+            if (fieldLayout.GetTagPose(tag.tag_id) != std::nullopt){
 
                 for (int i = 0; i < 4; i++){
                     imagePoints.emplace_back(tag.cornerCoords[i]);
@@ -92,7 +95,6 @@ namespace localization {
         }
 
         cv::Mat rvec, tvec;
-        cv::Mat R, T;
         cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
         
         double timestamp = 0.0;
@@ -111,12 +113,13 @@ namespace localization {
             -rvec.at<double>(1));
         auto rotation = frc::Rotation3d(vec, units::angle::radian_t{vec.norm()});
 
+        // TODO fieldToChassis using cameraWrtChassis
         auto fieldToCam = frc::Transform3d(translation, rotation).Inverse();
 
         std::vector<pose3d_estimate_t> estimates{}; 
         auto pose = frc::Pose3d();
 
-        estimates.emplace_back(pose3d_estimate_t(pose.TransformBy(fieldToCam), timestamp, 0));
+        estimates.emplace_back(pose3d_estimate_t(pose.TransformBy(fieldToCam), timestamp, 1));
 
         return estimates;
     }

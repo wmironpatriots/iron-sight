@@ -28,13 +28,13 @@
 #include <cstdlib>
 
 namespace {
-auto PumpGuiEventsAndGetKey() -> int {
-#if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
-    return cv::pollKey();
-#else
-    return cv::waitKey(1);
-#endif
-}
+    auto PumpGuiEventsAndGetKey() -> int {
+    #if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
+        return cv::pollKey();
+    #else
+        return cv::waitKey(1);
+    #endif
+    }
 }
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
@@ -46,15 +46,15 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     100,
     frc::Transform3d(),
     camera::camera_intrinsics_t{
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        619.9026951017695,
+        372.2792812903024,
+        539.3898006061588,
+        539.0735059998198,
+        -0.3241468189388152,
+        0.10782527225392564,
+        -0.016410664585260946,
+        0.00013396458313481827,
+        -0.0002794187083645791
     }
 };
 
@@ -69,6 +69,7 @@ auto main() -> int {
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
     cv::namedWindow("2", cv::WINDOW_NORMAL);
+
 
     int count = 0;
     while (true) {
@@ -89,12 +90,12 @@ auto main() -> int {
         }
         count++;
 
-        cv::Mat image = cv::imread("./resources/field.png");
-        auto point = cv::Point2d((pose[0].position.X().value() / 16.540988) * image.cols, (pose[0].position.Y().value() / 8.069326) * tframe.frame.rows);
-        cv::circle(image, point, 15, cv::Scalar(0, 0, 255), -1);
 
-        cv::imshow(windowName, image);
+        cv::Mat fieldImg = cv::imread("./resources/field.png");
+        auto point = cv::Point2d((pose[0].position.X().value() / 16.540988) * fieldImg.cols, (pose[0].position.Y().value() / 8.069326) * tframe.frame.rows);
+        cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
 
+        cv::imshow(windowName, fieldImg);
 
         for (const auto& detection : detections){
             std::vector<cv::Point> corners;
