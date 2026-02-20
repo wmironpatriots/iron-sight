@@ -8,10 +8,23 @@
 // MIT license file in the root directory of this project
 #pragma once
 
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Pose3d.h>
+#include <frc/geometry/Rotation3d.h>
+#include <vector>
 #include "src/utils/PCH.h"
 #include "src/localization/AprilTagSearcher.h"
+#include "units/length.h"
 
 namespace localization {
+    constexpr units::length::meter_t kTagSize{0.1651};
+    const std::vector<frc::Pose3d> kTagCorners = {
+        frc::Pose3d(kTagSize / -2, kTagSize / 2, 0_m, frc::Rotation3d()),
+        frc::Pose3d(kTagSize / 2, kTagSize / 2, 0_m, frc::Rotation3d()),
+        frc::Pose3d(kTagSize / 2, kTagSize / -2, 0_m, frc::Rotation3d()),
+        frc::Pose3d(kTagSize / -2, kTagSize / -2, 0_m, frc::Rotation3d())
+    };
+
     /** Represents a robot position estimate in 3D space (x, y, z) */
     using pose3d_estimate_t = struct Pose3dEstimate {
         /** A Pose3d object storing the estimated pose */

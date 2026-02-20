@@ -8,6 +8,8 @@
 // MIT license file in the root directory of this project
 #pragma once
 
+#include <frc/geometry/Transform3d.h>
+#include <opencv2/core/mat.hpp>
 #include "src/localization/PositionEstimator.h"
 #include "apriltag/frc/apriltag/AprilTagFieldLayout.h"
 
@@ -17,7 +19,6 @@ namespace localization {
     class MultiTagPositionEstimator : IPositionEstimator {
         public:
             MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, cv::Mat cameraMatrix, cv::Mat distCoeffs);
-            auto OpencvRvecTvec2WpilibPose3d(cv::Mat& rvec, cv::Mat& tvec) -> frc::Pose3d;
             auto estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> override;
         private:
             frc::AprilTagFieldLayout fieldLayout;
