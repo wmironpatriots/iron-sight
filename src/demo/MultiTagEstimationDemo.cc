@@ -63,6 +63,7 @@ auto main() -> int {
 
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
+    cv::namedWindow("2", cv::WINDOW_NORMAL);
 
     int count = 0;
     while (true) {
@@ -88,6 +89,29 @@ auto main() -> int {
         cv::circle(image, point, 15, cv::Scalar(0, 0, 255), -1);
 
         cv::imshow(windowName, image);
+
+
+        for (const auto& detection : detections){
+            std::vector<cv::Point> corners;
+            corners.reserve(detection.cornerCoords.size());
+        for (const auto& corner : detection.cornerCoords) {
+                corners.emplace_back(
+                    static_cast<int>(std::lround(corner.x)),
+                    static_cast<int>(std::lround(corner.y))
+                );
+            }
+            std::vector<std::vector<cv::Point>> contours = {corners};
+            cv::polylines(tframe.frame, contours, true, cv::Scalar(0, 255, 0), 7);
+            for (auto & corner : corners) {
+                cv::circle(tframe.frame, corner, 15, cv::Scalar(0, 0, 255), -1);
+            }
+            cv::Point2d center = detection.center;
+            cv::putText(tframe.frame, "ID: " + std::to_string(detection.tag_id),
+                       center, cv::FONT_HERSHEY_SIMPLEX, 3,
+                       cv::Scalar(255, 0, 0), 5);
+            
+        }
+        cv::imshow("2", tframe.frame);
         if (PumpGuiEventsAndGetKey() == 'q') {
             break;
         }

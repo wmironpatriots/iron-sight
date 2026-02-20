@@ -67,14 +67,15 @@ namespace localization {
             }
             frc::Pose3d tagPose = fieldLayout.GetTagPose(tag.tag_id).value();
             //std::cerr << "debug \n";
-            double x = tagPose.X().value();
-            double y = tagPose.Y().value();
-            double z = tagPose.Z().value();
-            //std::cerr << x << " " << y << " " << z << "\n";
-            objectPoints.emplace_back(x-half, y+half, z);
-            objectPoints.emplace_back(x+half, y+half, z);
-            objectPoints.emplace_back(x+half, y-half, z);
-            objectPoints.emplace_back(x-half, y-half, z);
+            frc::Pose3d corner0 = tagPose.TransformBy(frc::Transform3d{frc::Translation3d{-units::meter_t{half}, units::meter_t{half}, 0_m}, frc::Rotation3d{}});
+            frc::Pose3d corner1 = tagPose.TransformBy(frc::Transform3d{frc::Translation3d{units::meter_t{half}, units::meter_t{half}, 0_m}, frc::Rotation3d{}});
+            frc::Pose3d corner2 = tagPose.TransformBy(frc::Transform3d{frc::Translation3d{units::meter_t{half}, -units::meter_t{half}, 0_m}, frc::Rotation3d{}});
+            frc::Pose3d corner3 = tagPose.TransformBy(frc::Transform3d{frc::Translation3d{-units::meter_t{half}, -units::meter_t{half}, 0_m}, frc::Rotation3d{}});
+
+            objectPoints.emplace_back(corner0.X().value(), corner0.Y().value(), corner0.Z().value());
+            objectPoints.emplace_back(corner1.X().value(), corner1.Y().value(), corner1.Z().value());
+            objectPoints.emplace_back(corner2.X().value(), corner2.Y().value(), corner2.Z().value());
+            objectPoints.emplace_back(corner3.X().value(), corner3.Y().value(), corner3.Z().value());
         }
 
         cv::Mat rvec, tvec;
