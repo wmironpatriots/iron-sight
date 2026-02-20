@@ -82,8 +82,12 @@ namespace localization {
                 frc::Pose3d tagPose = fieldLayout.GetTagPose(tag.tag_id).value();
 
                 for (auto pose : kTagCorners) {
-                    pose.TransformBy(frc::Transform3d(tagPose.Translation(), tagPose.Rotation()));
-                    objectPoints.emplace_back(pose.X().value(), pose.Y().value(), pose.Z().value());
+                    auto wpilibTransform = frc::Transform3d(tagPose.Translation(), tagPose.Rotation());
+                    auto cvTransform = frc::CoordinateSystem::Convert(wpilibTransform, frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
+
+                    pose.TransformBy(cvTransform);
+
+                    objectPoints.emplace_back(pose.Y().value(), pose.Y().value(), pose.Z().value());
                 }
 
             } else {
@@ -101,25 +105,20 @@ namespace localization {
         if (!found_tags.empty()){
             timestamp = found_tags[0].timestampSeconds;
         }
-        
-        units::length::meter_t x{tvec.at<double>(2)};
-        units::length::meter_t y{-tvec.at<double>(0)};
-        units::length::meter_t z{-tvec.at<double>(1)};
-        auto translation = frc::Translation3d(x, y, z);
 
-        Eigen::Vector3d vec(
-            rvec.at<double>(2), 
-            -rvec.at<double>(0), 
-            -rvec.at<double>(1));
-        auto rotation = frc::Rotation3d(vec, units::angle::radian_t{vec.norm()});
+        Eigen::Vector3d T(tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2));
+        auto translation = frc::Translation3d(T);
 
-        // TODO fieldToChassis using cameraWrtChassis
-        auto fieldToCam = frc::Transform3d(translation, rotation);
+        Eigen::Vector3d R(rvec.at<double>(0), rvec.at<double>(1), rvec.at<double>(2));
+        auto rotation = frc::Rotation3d(R, units::angle::radian_t{R.norm()});
+
+        auto cvFieldToCamera = frc::Transform3d(translation, rotation);
+        auto wpilibFieldToCamera = frc::CoordinateSystem::Convert(cvFieldToCamera, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
+
+        auto pose = frc::Pose3d().TransformBy(wpilibFieldToCamera);
 
         std::vector<pose3d_estimate_t> estimates{}; 
-        auto pose = frc::Pose3d();
-
-        estimates.emplace_back(pose3d_estimate_t(pose.TransformBy(fieldToCam), timestamp, 1));
+        estimates.emplace_back(pose3d_estimate_t(pose, timestamp, 1));
 
         return estimates;
     }
