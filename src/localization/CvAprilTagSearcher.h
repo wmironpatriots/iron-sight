@@ -16,7 +16,11 @@ namespace localization {
         public:
             CvAprilTagSearcher();
             ~CvAprilTagSearcher() override;
-            auto findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> override;
+            CvAprilTagSearcher(const CvAprilTagSearcher&) = delete;
+            auto operator=(const CvAprilTagSearcher&) -> CvAprilTagSearcher& = delete;
+            CvAprilTagSearcher(CvAprilTagSearcher&&) = delete;
+            auto operator=(CvAprilTagSearcher&&) -> CvAprilTagSearcher& = delete;
+            auto findTags(const camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> override;
         private:
             apriltag_family_t* tf;
             apriltag_detector_t* td;

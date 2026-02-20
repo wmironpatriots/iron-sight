@@ -20,29 +20,40 @@ namespace localization {
         td->refine_edges = false;
     };
 
-    auto CvAprilTagSearcher::findTags(camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {
-        cv::Mat framec = tframe.frame;
-        cv::Mat frame;
-        cv::cvtColor(framec, frame, cv::COLOR_BGR2GRAY);
-        image_u8_t image = {frame.cols, frame.rows, frame.cols, frame.data};
+    auto CvAprilTagSearcher::findTags(const camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {
+        if (tframe.frame.empty()) {
+            return {};
+        }
+        
+        cv::Mat gray_frame;
+        cv::cvtColor(tframe.frame, gray_frame, cv::COLOR_BGR2GRAY); 
+
+        image_u8_t image {
+        gray_frame.cols, 
+        gray_frame.rows, 
+        static_cast<int>(gray_frame.step), 
+        gray_frame.data
+        };
         
         zarray_t* raw_detections = apriltag_detector_detect(td, &image);
+        const int detection_count = zarray_size(raw_detections);
         std::vector<found_apriltag_t> tag_detections{};
+        tag_detections.reserve(static_cast<std::size_t>(detection_count));
+        const double timestamp_seconds = tframe.timestamp.value();
 
-        for (int i = 0; i < zarray_size(raw_detections); i++){
+        for (int i = 0; i < detection_count; i++){
             apriltag_detection_t* single_detection;
             zarray_get(raw_detections, i, &single_detection);
             
-            found_apriltag_t detection;
+            auto& detection = tag_detections.emplace_back();
             detection.tag_id = single_detection->id;
             detection.decision_margin = single_detection->decision_margin;
             detection.center = cv::Point2d(single_detection->c[0], single_detection->c[1]);
-            detection.timestampSeconds = tframe.timestamp.value();
+            detection.timestampSeconds = timestamp_seconds;
             
             for (int j = 0; j < 4; j++){
                 detection.cornerCoords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][1]);
             }
-            tag_detections.push_back(detection);
         }
         apriltag_detections_destroy(raw_detections);
         return tag_detections;
