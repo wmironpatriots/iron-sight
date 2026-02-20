@@ -22,6 +22,7 @@
 #include <thread>
 #include <frc/smartdashboard/Field2d.h>
 #include <networktables/NetworkTableInstance.h>
+#include <frc/geometry/CoordinateSystem.h>
 #include <ntcore_cpp.h>
 #include <cstdlib>
 

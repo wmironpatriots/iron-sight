@@ -8,7 +8,14 @@
 // MIT license file in the root directory of this project
 #include "src/localization/MultiTagPositionEstimator.h"
 #include <frc/apriltag/AprilTagFieldLayout.h>
+#include <frc/geometry/CoordinateAxis.h>
+#include <frc/geometry/CoordinateSystem.h>
 #include <frc/geometry/Pose3d.h>
+#include <frc/geometry/Rotation3d.h>
+#include <frc/geometry/Translation3d.h>
+#include <units/angle.h>
+#include <units/length.h>
+#include <Eigen/Core>
 #include <opencv2/core/types.hpp>
 #include <opencv2/calib3d.hpp>
 #include <Eigen/Geometry>
@@ -16,6 +23,7 @@
 #include <vector>
 #include "src/localization/AprilTagSearcher.h"
 #include "src/localization/PositionEstimator.h"
+#include "units/length.h"
 
 namespace localization {
     MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout,
@@ -24,56 +32,21 @@ namespace localization {
                                                         : fieldLayout(std::move(fieldLayout)),
                                                         cameraMatrix(std::move(cameraMatrix)),
                                                         distCoeffs(std::move(distCoeffs)) {};
+
     auto MultiTagPositionEstimator::OpencvRvecTvec2WpilibPose3d(cv::Mat& rvec, cv::Mat& tvec) -> frc::Pose3d {
-        cv::Mat rotation_cv;
-        cv::Rodrigues(rvec, rotation_cv);
+        units::length::meter_t x{tvec.at<double>(0, 0)};
+        units::length::meter_t y{tvec.at<double>(1, 0)};
+        units::length::meter_t z{tvec.at<double>(2, 0)};
+        auto translation = frc::Translation3d(x, y, z);
 
-        cv::Mat rotation64;
-        rotation_cv.convertTo(rotation64, CV_64F);
+        Eigen::Vector3d vec(rvec.at<double>(0, 0), rvec.at<double>(1, 0), rvec.at<double>(2, 0));
+        auto rotation = frc::Rotation3d(vec, units::angle::radian_t{cv::norm(rvec)});
 
-        cv::Mat translation64;
-        tvec.convertTo(translation64, CV_64F);
+        auto cvPose = frc::Pose3d(translation, rotation);
 
-        Eigen::Matrix3d rotation_object_to_camera_mixed;
-        for (int r = 0; r < 3; ++r) {
-            for (int c = 0; c < 3; ++c) {
-                rotation_object_to_camera_mixed(r, c) = rotation64.at<double>(r, c);
-            }
-        }
-
-        Eigen::Vector3d translation_object_to_camera;
-        translation_object_to_camera.x() = translation64.at<double>(0, 0);
-        translation_object_to_camera.y() = translation64.at<double>(1, 0);
-        translation_object_to_camera.z() = translation64.at<double>(2, 0);
-
-        // OpenCV solvePnP returns X_cam(cv) = R * X_obj(wpi) + t.
-        // Invert to get camera origin in object/frame coordinates.
-        Eigen::Matrix3d rotation_camera_to_object_mixed = rotation_object_to_camera_mixed.transpose();
-        Eigen::Vector3d translation_camera_in_object_wpi =
-            -rotation_camera_to_object_mixed * translation_object_to_camera;
-
-        // OpenCV camera axes -> WPILib camera axes:
-        // cv: +x right, +y down, +z forward
-        // wpi: +x forward, +y left, +z up
-        Eigen::Matrix3d cv_to_wpi;
-        cv_to_wpi << 0, 0, 1,
-                    -1, 0, 0,
-                     0, -1, 0;
-
-        // Only one basis conversion is needed here. Left-multiplying again
-        // would apply the axis remap twice and swap/negate incorrectly.
-        Eigen::Matrix3d rotation_camera_to_object_wpi = rotation_camera_to_object_mixed * cv_to_wpi.transpose();
-
-        Eigen::Quaterniond q(rotation_camera_to_object_wpi);
-        frc::Rotation3d rot{frc::Quaternion{q.w(), q.x(), q.y(), q.z()}};
-        frc::Translation3d trans{
-            units::meter_t{translation_camera_in_object_wpi.x()},
-            units::meter_t{translation_camera_in_object_wpi.y()},
-            units::meter_t{translation_camera_in_object_wpi.z()}
-        };
-
-        return frc::Pose3d{trans, rot};
+        return frc::CoordinateSystem::Convert(cvPose, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
     }
+
     auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
         if (found_tags.empty()){
             std::vector<pose3d_estimate_t> estimates{}; 
