@@ -47,7 +47,7 @@ namespace localization {
         auto wpilibFieldToCamera = frc::CoordinateSystem::Convert(cvFieldToCamera, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
         return wpilibFieldToCamera;
     }
-    
+
     auto generateCameraMatrix(const camera::CameraConfig& config) -> cv::Mat {
         auto intrinsics = config.intrinsicsCalibration;
         cv::Mat matrix = (cv::Mat_<double>(3, 3) <<
@@ -80,8 +80,8 @@ namespace localization {
         std::vector<cv::Point3d> objectPoints;
 
         for (found_apriltag_t tag : found_tags){
-            std::vector<cv::Point2d> singleTagImagePoints{};
-            std::vector<cv::Point3d> singleTagObjectPoints{};
+            std::vector<cv::Point2d> singleTagImagePoints = {};
+            std::vector<cv::Point3d> singleTagObjectPoints = {};
             if (fieldLayout.GetTagPose(tag.tag_id) != std::nullopt){
 
                 for (int i = 0; i < 4; i++){
@@ -98,8 +98,9 @@ namespace localization {
                     singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                     objectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                 }
+
                 cv::Mat singleTagRvec, singleTagTvec;
-                cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, singleTagRvec, singleTagTvec, false, cv::SOLVEPNP_IPPE_SQUARE);
+                cv::solvePnP(singleTagObjectPoints, singleTagImagePoints, cameraMatrix, distCoeffs, singleTagRvec, singleTagTvec, false, cv::SOLVEPNP_IPPE_SQUARE);
                 
                 auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(singleTagRvec, singleTagTvec));
 

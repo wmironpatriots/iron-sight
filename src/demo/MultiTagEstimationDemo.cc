@@ -77,25 +77,29 @@ auto main() -> int {
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
         auto pose = poseEstimator.estimatePosition(detections);
+        cv::Mat fieldImg = cv::imread("./resources/field.png");
+
+
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
-        if (count >= 1){
-            std::system("clear");
-            std::cerr << "FPS: " << 1/elapsed.count() << "\n";
-            std::cerr << pose[0].position.X().value() << "\n";
-            std::cerr << pose[0].position.Y().value() << "\n"; 
-            std::cerr << pose[0].position.Z().value() << "\n";
-            count = 0;
-            
+        if (!pose.empty()){
+            if (count >= 1){
+                std::system("clear");
+                std::cerr << "FPS: " << 1/elapsed.count() << "\n";
+                std::cerr << pose[0].position.X().value() << "\n";
+                std::cerr << pose[0].position.Y().value() << "\n"; 
+                std::cerr << pose[0].position.Z().value() << "\n";
+                count = 0;
+                
+            }
+            count++;
+
+        
+            for (auto position : pose) {
+                auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * tframe.frame.rows);
+                cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
+            }
         }
-        count++;
-
-
-        cv::Mat fieldImg = cv::imread("./resources/field.png");
-        auto point = cv::Point2d((pose[0].position.X().value() / 16.540988) * fieldImg.cols, (pose[0].position.Y().value() / 8.069326) * tframe.frame.rows);
-        cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
-
-        cv::imshow(windowName, fieldImg);
 
         for (const auto& detection : detections){
             std::vector<cv::Point> corners;
@@ -113,13 +117,17 @@ auto main() -> int {
             }
             cv::Point2d center = detection.center;
             cv::putText(tframe.frame, "ID: " + std::to_string(detection.tag_id),
-                       center, cv::FONT_HERSHEY_SIMPLEX, 3,
-                       cv::Scalar(255, 0, 0), 5);
+                    center, cv::FONT_HERSHEY_SIMPLEX, 3,
+                    cv::Scalar(255, 0, 0), 5);
             
         }
+    
+        cv::imshow(windowName, fieldImg);
         cv::imshow("2", tframe.frame);
         if (PumpGuiEventsAndGetKey() == 'q') {
             break;
         }
     }
 }
+    
+    
