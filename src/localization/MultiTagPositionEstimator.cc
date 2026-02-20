@@ -85,9 +85,9 @@ namespace localization {
                     auto wpilibTransform = frc::Transform3d(tagPose.Translation(), tagPose.Rotation());
                     auto cvTransform = frc::CoordinateSystem::Convert(wpilibTransform, frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
 
-                    pose.TransformBy(cvTransform);
+                    auto transformed = pose.TransformBy(cvTransform);
 
-                    objectPoints.emplace_back(pose.Y().value(), pose.Y().value(), pose.Z().value());
+                    objectPoints.emplace_back(transformed.Y().value(), transformed.Y().value(), transformed.Z().value());
                 }
 
             } else {
