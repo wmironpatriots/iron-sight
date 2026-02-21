@@ -85,8 +85,11 @@ namespace localization {
             if (fieldLayout.GetTagPose(tag.tag_id) != std::nullopt){
 
                 for (int i = 0; i < 4; i++){
-                    singleTagImagePoints.emplace_back(tag.cornerCoords[i]);
+                    
                     imagePoints.emplace_back(tag.cornerCoords[i]);
+
+                    //ippe square excpects a different order of points
+                    singleTagImagePoints.emplace_back(tag.cornerCoords[3-i]);
                 }
 
                 auto cvTagPose = frc::CoordinateSystem::Convert(fieldLayout.GetTagPose(tag.tag_id).value(), frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
@@ -95,7 +98,7 @@ namespace localization {
                     auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
 
                     auto cornerPose = pose.TransformBy(cornerTransform);
-                    singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
+                    singleTagObjectPoints.emplace_back(pose.X().value(), pose.Y().value(), 0);
                     objectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                 }
 
@@ -103,8 +106,8 @@ namespace localization {
                 cv::solvePnP(singleTagObjectPoints, singleTagImagePoints, cameraMatrix, distCoeffs, singleTagRvec, singleTagTvec, false, cv::SOLVEPNP_IPPE_SQUARE);
                 
                 auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(singleTagRvec, singleTagTvec));
-
-                estimates.emplace_back(pose3d_estimate_t(pose, tag.timestampSeconds, 1));
+                auto globalPose = pose.RelativeTo(fieldLayout.GetTagPose(tag.tag_id).value());
+                estimates.emplace_back(pose3d_estimate_t(globalPose, tag.timestampSeconds, 1));
             } else {
 
                 std::cerr << "Invalid AprilTag ID found! \n";
