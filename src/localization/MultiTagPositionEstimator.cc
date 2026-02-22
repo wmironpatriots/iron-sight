@@ -33,44 +33,14 @@
 #include "src/localization/AprilTagSearcher.h"
 #include "src/localization/PositionEstimator.h"
 #include "units/length.h"
-
+#include "src/utils/VisionUtils.h"
 namespace localization {
-
-    auto ConvertOpencvRvecTvecToWpiLibTransform(cv::Mat rvec, cv::Mat tvec) -> frc::Transform3d {
-        Eigen::Vector3d T(tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2));
-        auto translation = frc::Translation3d(T);
-
-        Eigen::Vector3d R(rvec.at<double>(0), rvec.at<double>(1), rvec.at<double>(2));
-        auto rotation = frc::Rotation3d(R, units::angle::radian_t{R.norm()});
-
-        auto cvFieldToCamera = frc::Transform3d(translation, rotation).Inverse();
-        auto wpilibFieldToCamera = frc::CoordinateSystem::Convert(cvFieldToCamera, frc::CoordinateSystem::EDN(), frc::CoordinateSystem::NWU());
-        return wpilibFieldToCamera;
-    }
-
-    auto generateCameraMatrix(const camera::CameraConfig& config) -> cv::Mat {
-        auto intrinsics = config.intrinsicsCalibration;
-        cv::Mat matrix = (cv::Mat_<double>(3, 3) <<
-            intrinsics.fx, 0,             intrinsics.cx,
-            0,             intrinsics.fy, intrinsics.cy,
-            0,             0,             1);
-
-        return matrix;
-    }
-
-    auto generateDistCoeffs(const camera::CameraConfig& config) -> cv::Mat {
-        auto intrinsics = config.intrinsicsCalibration;
-        cv::Mat matrix = (cv::Mat_<double>(1, 5) <<
-            intrinsics.k1, intrinsics.k2, intrinsics.p1, intrinsics.p2, intrinsics.k3);
-
-        return matrix;
-    }
 
     MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig)
                                                         : fieldLayout(std::move(fieldLayout)),
                                                         cameraWrtChassis(cameraConfig.transformWrtChassis),
-                                                        cameraMatrix(generateCameraMatrix(cameraConfig)),
-                                                        distCoeffs(generateDistCoeffs(cameraConfig)) {};
+                                                        cameraMatrix(utils::generateCameraMatrix(cameraConfig)),
+                                                        distCoeffs(utils::generateDistCoeffs(cameraConfig)) {};
 
     
         auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
@@ -105,7 +75,7 @@ namespace localization {
                 cv::Mat singleTagRvec, singleTagTvec;
                 cv::solvePnP(singleTagObjectPoints, singleTagImagePoints, cameraMatrix, distCoeffs, singleTagRvec, singleTagTvec, false, cv::SOLVEPNP_IPPE_SQUARE);
                 
-                auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(singleTagRvec, singleTagTvec));
+                auto pose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(singleTagRvec, singleTagTvec));
                 auto globalPose = pose.RelativeTo(fieldLayout.GetTagPose(tag.tag_id).value());
                 estimates.emplace_back(pose3d_estimate_t(globalPose, tag.timestampSeconds, 1));
             } else {
@@ -120,7 +90,7 @@ namespace localization {
         }
         cv::Mat rvec, tvec;
         cv::solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec, false, cv::SOLVEPNP_SQPNP);
-        auto pose = frc::Pose3d().TransformBy(ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec));
+        auto pose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec));
         double timestamp = 0.0;
         timestamp = found_tags[0].timestampSeconds;
         estimates.emplace_back(pose3d_estimate_t(pose, timestamp, 1));

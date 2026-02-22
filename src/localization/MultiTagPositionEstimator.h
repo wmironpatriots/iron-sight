@@ -15,14 +15,7 @@
 #include "apriltag/frc/apriltag/AprilTagFieldLayout.h"
 
 namespace localization {
-    /** Generate Camera Matrix from config */
-    auto generateCameraMatrix(const camera::CameraConfig& config) -> cv::Mat;
-
-    /** Generate Distance Coefficents Matrix from config */
-    auto generateDistCoeffs(const camera::CameraConfig& config) -> cv::Mat;
-
-    auto ConvertOpencvRvecTvecToWpiLibTransform(cv::Mat rvec, cv::Mat tvec) -> frc::Transform3d;
-
+    
     /** Represents a PositionEstimator that solves based on many found tags */
     class MultiTagPositionEstimator : IPositionEstimator {
         public:

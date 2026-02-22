@@ -1,4 +1,4 @@
-add_library(utils NtUtils.cc) 
+add_library(utils NtUtils.cc VisionUtils.cc) 
 target_link_libraries(utils PUBLIC wpilibc nlohmann_json::nlohmann_json)
 
 if(!ENABLE_CLANG_TIDY)
