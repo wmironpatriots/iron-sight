@@ -15,6 +15,7 @@
 #include "src/camera/CameraStream.h"
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
+#include "src/localization/IPPESquarePositionEstimator.h"
 #include <cmath>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
@@ -65,7 +66,7 @@ auto main() -> int {
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, kDemoCam);
-
+    auto squarePoseEstimator = localization::IPPESquarePositionEstimator(fieldLayout, kDemoCam);
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
     cv::namedWindow("2", cv::WINDOW_NORMAL);
@@ -77,6 +78,7 @@ auto main() -> int {
         camera::TimestampedFrame tframe = camera.getTimestampedFrame();
         auto detections = searcher.findTags(tframe);
         auto pose = poseEstimator.estimatePosition(detections);
+        auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
 
 
@@ -98,6 +100,10 @@ auto main() -> int {
             for (auto position : pose) {
                 auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
                 cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
+            }
+            for (auto position : squarepose) {
+                auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
+                cv::circle(fieldImg, point, 15, cv::Scalar(255, 0, 0), -1);
             }
         }
 

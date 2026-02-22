@@ -19,8 +19,6 @@
 #include <units/angle.h>
 #include <units/length.h>
 #include <Eigen/Core>
-#include <iterator>
-#include <numeric>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core/types.hpp>
@@ -74,9 +72,11 @@ namespace localization {
             }
 
         }
+
         if (objectPoints.empty() && imagePoints.empty()){
             return {};
         }
+
         std::vector<cv::Mat> rvecs, tvecs;
         std::vector<double> reprojectionErrors;
         cv::solvePnPGeneric(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvecs, tvecs, false, cv::SOLVEPNP_IPPE_SQUARE, cv::noArray(), cv::noArray());
