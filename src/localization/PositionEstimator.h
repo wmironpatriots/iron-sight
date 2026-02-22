@@ -31,7 +31,7 @@ namespace localization {
         frc::Pose3d position;
         /** The timestamp in seconds representing and estimate of when the robot was at this position */
         double timestamp;
-        /** Represents the measured error in estimation */
+        /** Represents the measured error in pixels */
         double variance;
     };
 
