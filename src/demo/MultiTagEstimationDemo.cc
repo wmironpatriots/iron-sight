@@ -39,12 +39,12 @@ namespace {
 }
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
-    2,
+    3,
     cv::CAP_V4L2,
     "MJPG",
     800,
     600,
-    100,
+    120,
     frc::Transform3d(),
     camera::camera_intrinsics_t{
         619.9026951017695,

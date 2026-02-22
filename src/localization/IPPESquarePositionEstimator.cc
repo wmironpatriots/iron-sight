@@ -44,7 +44,7 @@ namespace localization {
         auto IPPESquarePositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
         std::vector<pose3d_estimate_t> estimates{};
 
-        for (found_apriltag_t tag : found_tags){
+        for (const found_apriltag_t& tag : found_tags){
             auto tagPose = fieldLayout.GetTagPose(tag.tag_id);
             std::vector<cv::Point2d> singleTagImagePoints = {};
             std::vector<cv::Point3d> singleTagObjectPoints = {};
@@ -61,11 +61,22 @@ namespace localization {
 
                 std::vector<cv::Mat> rvecs, tvecs;
                 std::vector<double> reprojectionErrors;
-                cv::solvePnPGeneric(singleTagObjectPoints, singleTagImagePoints, cameraMatrix, distCoeffs, rvecs, tvecs, false, cv::SOLVEPNP_IPPE_SQUARE, cv::noArray(), cv::noArray());
+                cv::solvePnPGeneric(singleTagObjectPoints, 
+                                    singleTagImagePoints,
+                                                cameraMatrix, 
+                                                distCoeffs, 
+                                                rvecs, 
+                                                tvecs, 
+                                                false, 
+                                                cv::SOLVEPNP_IPPE_SQUARE, 
+                                                cv::noArray(), 
+                                                cv::noArray(), 
+                                                reprojectionErrors);
                 
-                for (int i = 0; i < 2; i++) {
-                    auto pose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(rvecs[i], tvecs[i]));
-                    auto cameraPose = pose.RelativeTo(tagPose.value());
+
+                for (int i = 0; i < rvecs.size(); i++) {
+                    auto tagToCamera = utils::ConvertOpencvRvecTvecToWpiLibTransform(rvecs[i], tvecs[i]).Inverse();
+                    auto cameraPose = tagPose.value().TransformBy(tagToCamera);
                     auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
                     estimates.emplace_back(pose3d_estimate_t(robotPose, tag.timestampSeconds, reprojectionErrors[i]));
                 }
