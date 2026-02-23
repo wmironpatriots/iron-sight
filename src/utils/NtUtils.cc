@@ -25,8 +25,9 @@ namespace utils {
 
         instance.StartClient4("iron-sight");
         instance.SetServerTeam(kTeamNumber);
+        instance.StartDSClient();
 
-        frc::DataLogManager::Start(kPrefix + "/logs");
+        // frc::DataLogManager::Start(kPrefix + "/logs");
 
         printf("Waiting for Connection to %d\n", kTeamNumber);
         while (!kNtInstance.IsConnected()) {

@@ -13,6 +13,8 @@
 #include <networktables/StructTopic.h>
 #include <networktables/DoubleTopic.h>
 #include <networktables/Topic.h>
+#include <cstdlib>
+#include <filesystem>
 #include <string>
 
 namespace utils {
@@ -23,7 +25,7 @@ namespace utils {
     const int kTeamNumber = 6423;
 
     /** The directory to store outputs on NetworkTables */
-    const std::string kPrefix = "/iron-sight";
+    const std::string kPrefix = std::filesystem::current_path();
 
     /**
      * Start NetworkTables Connection
