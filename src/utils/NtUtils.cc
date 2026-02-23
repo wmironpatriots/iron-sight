@@ -10,6 +10,7 @@
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/StructTopic.h>
+#include <frc/DataLogManager.h>
 #include <ntcore_cpp.h>
 #include <chrono>
 #include <memory>

@@ -78,7 +78,7 @@ namespace localization {
                     auto tagToCamera = utils::ConvertOpencvRvecTvecToWpiLibTransform(rvecs[i], tvecs[i]).Inverse();
                     auto cameraPose = tagPose.value().TransformBy(tagToCamera);
                     auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
-                    estimates.emplace_back(pose3d_estimate_t(robotPose, tag.timestampSeconds, reprojectionErrors[i]));
+                    estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestampSeconds, reprojectionErrors[i]));
                 }
 
             } else {

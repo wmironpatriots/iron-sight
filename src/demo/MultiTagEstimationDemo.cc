@@ -85,10 +85,9 @@ auto main() -> int {
         auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
 
-
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
-        if (!pose.empty()){
+            if (!pose.empty()){
             if (count >= 1){
                 std::system("clear");
                 std::cerr << "FPS: " << 1/elapsed.count() << "\n";
@@ -100,11 +99,9 @@ auto main() -> int {
             }
             count++;
 
-        
             for (auto position : pose) {
                 auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
                 cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
-                publisher.publish(position);
             }
             for (auto position : squarepose) {
                 auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
