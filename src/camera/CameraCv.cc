@@ -9,22 +9,22 @@
 #include "src/camera/CameraCv.h"
 
 namespace camera {
-  CameraCv::CameraCv(const CameraConfig& config) {
-    mConfig = config;
-    mCameraCapture = cv::VideoCapture(config.deviceId, config.apiId);
+CameraCv::CameraCv(const CameraConfig& config) {
+  mConfig = config;
+  mCameraCapture = cv::VideoCapture(config.deviceId, config.apiId);
 
-    // Check if stream connected to camera
-    if (!mCameraCapture.isOpened()) {
-      printf("Error ~ Failed to open camera\n");
-      throw;
-    }
-  }
-
-  auto CameraCv::getTimestampedFrame() -> TimestampedFrame {
-    TimestampedFrame tframe;
-    mCameraCapture.read(tframe.frame);
-    tframe.timestamp = frc::Timer::GetFPGATimestamp();
-
-    return tframe;
+  // Check if stream connected to camera
+  if (!mCameraCapture.isOpened()) {
+    printf("Error ~ Failed to open camera\n");
+    throw;
   }
 }
+
+auto CameraCv::getTimestampedFrame() -> TimestampedFrame {
+  TimestampedFrame tframe;
+  mCameraCapture.read(tframe.frame);
+  tframe.timestamp = frc::Timer::GetFPGATimestamp();
+
+  return tframe;
+}
+}  // namespace camera

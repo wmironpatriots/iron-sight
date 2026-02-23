@@ -10,32 +10,32 @@
 #include "src/camera/CameraStream.h"
 
 namespace camera {
-  CameraStream::CameraStream(std::unique_ptr<Camera> io) : mIO(std::move(io)) {
-    mTimestampedFrame = mIO->getTimestampedFrame();
+CameraStream::CameraStream(std::unique_ptr<Camera> io) : mIO(std::move(io)) {
+  mTimestampedFrame = mIO->getTimestampedFrame();
 
-    mThread = std::thread([this]() -> void {
-      TimestampedFrame tframe;
-      tframe = mIO->getTimestampedFrame();
+  mThread = std::thread([this]() -> void {
+    TimestampedFrame tframe;
+    tframe = mIO->getTimestampedFrame();
 
-      mMutex.lock();
-      mTimestampedFrame = tframe;
-      mMutex.unlock();
-    });
-  };
-
-  auto CameraStream::getTimestampedFrame() -> TimestampedFrame {
     mMutex.lock();
-    TimestampedFrame tframe = mTimestampedFrame;
+    mTimestampedFrame = tframe;
     mMutex.unlock();
+  });
+};
 
-    return tframe;
-  };
+auto CameraStream::getTimestampedFrame() -> TimestampedFrame {
+  mMutex.lock();
+  TimestampedFrame tframe = mTimestampedFrame;
+  mMutex.unlock();
 
-  auto CameraStream::getFrame() -> cv::Mat {
-    mMutex.lock();
-    cv::Mat frame = mTimestampedFrame.frame;
-    mMutex.unlock();
+  return tframe;
+};
 
-    return frame;
-  };
-}
+auto CameraStream::getFrame() -> cv::Mat {
+  mMutex.lock();
+  cv::Mat frame = mTimestampedFrame.frame;
+  mMutex.unlock();
+
+  return frame;
+};
+}  // namespace camera

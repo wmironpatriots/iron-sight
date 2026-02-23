@@ -11,19 +11,19 @@
 #include "src/camera/Camera.h"
 
 namespace camera {
-  /** Represents a continious stream of timestamped frames from camera */
-  class CameraStream {
-  public:
-    CameraStream(std::unique_ptr<Camera> IO);
-    /** Return lastest timestamped frame from stream */
-    auto getTimestampedFrame() -> TimestampedFrame;
-    /** Return latest raw frame */
-    auto getFrame() -> cv::Mat;
+/** Represents a continious stream of timestamped frames from camera */
+class CameraStream {
+ public:
+  CameraStream(std::unique_ptr<Camera> IO);
+  /** Return lastest timestamped frame from stream */
+  auto getTimestampedFrame() -> TimestampedFrame;
+  /** Return latest raw frame */
+  auto getFrame() -> cv::Mat;
 
-  private:
-    std::unique_ptr<Camera> mIO;
-    TimestampedFrame mTimestampedFrame;
-    std::thread mThread;
-    std::mutex mMutex;
-  };
-}
+ private:
+  std::unique_ptr<Camera> mIO;
+  TimestampedFrame mTimestampedFrame;
+  std::thread mThread;
+  std::mutex mMutex;
+};
+}  // namespace camera
