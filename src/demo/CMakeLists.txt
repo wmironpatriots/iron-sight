@@ -18,4 +18,9 @@ target_link_libraries(tag_tracker_demo PRIVATE ${OpenCV_LIBS} wpilibc apriltag n
 add_executable(multitag_estimation_demo MultiTagEstimationDemo.cc)
 target_link_libraries(multitag_estimation_demo PRIVATE ${OpenCV_LIBS} wpilibc apriltag ntcore localization camera utils)
 
+# Demo executable for FPSDemo
+add_executable(FPSDemo FPSDemo.cc)
+target_link_libraries(FPSDemo PRIVATE ${OpenCV_LIBS} wpilibc apriltag ntcore localization camera utils)
+
+
 set(CMAKE_CXX_CLANG_TIDY "")
