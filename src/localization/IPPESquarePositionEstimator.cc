@@ -51,16 +51,18 @@ namespace localization {
 
             if (tagPose != std::nullopt){
 
+                auto tagPose = fieldLayout.GetTagPose(tag.tag_id);
+
                 for (int i = 0; i < 4; i++){
                     singleTagImagePoints.emplace_back(tag.cornerCoords[i]);
                 }
 
-                auto cvTagPose = frc::CoordinateSystem::Convert(fieldLayout.GetTagPose(tag.tag_id).value(), frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
+                auto cvTagPose = frc::CoordinateSystem::Convert(tagPose.value(), frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
 
                 for (auto pose : kTagCorners) {
                     auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
                     auto cornerPose = pose.TransformBy(cornerTransform);
-                    singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), 0);
+                    singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                 }
 
                 cv::Mat rvec, tvec;
@@ -73,11 +75,9 @@ namespace localization {
                                                 false, 
                                                 cv::SOLVEPNP_IPPE_SQUARE);
                 
-                auto tagToCamera = utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec).Inverse();
-                auto cameraPose = tagPose.value().TransformBy(tagToCamera);
+                auto cameraPose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec));
                 auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
                 estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestampSeconds, 0));
-
 
             } else {
 
