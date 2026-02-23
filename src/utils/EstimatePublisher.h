@@ -11,6 +11,7 @@
 #include <networktables/NetworkTable.h>
 #include <memory>
 #include <mutex>
+#include "src/localization/PositionEstimator.h"
 #include "src/utils/NtUtils.h"
 
 // TODO docs
