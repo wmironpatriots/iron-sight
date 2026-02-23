@@ -78,7 +78,7 @@ namespace localization {
         }
 
         cv::Mat rvec, tvec;
-        cv::solvePnPGeneric(objectPoints, 
+        cv::solvePnP(objectPoints, 
                             imagePoints, 
                             cameraMatrix, 
                             distCoeffs, 

@@ -64,7 +64,7 @@ namespace localization {
                 }
 
                 cv::Mat rvec, tvec;
-                cv::solvePnPGeneric(singleTagObjectPoints, 
+                cv::solvePnP(singleTagObjectPoints, 
                                     singleTagImagePoints,
                                                 cameraMatrix, 
                                                 distCoeffs, 
