@@ -20,13 +20,13 @@ namespace yolo {
       Yolo(const std::string& model_path, bool swap_rb, bool verbose = false);
       ~Yolo() = default;
 
-      auto RunModel(const cv::Mat& frame) -> std::vector<float>;
+      auto RunModel(const cv::Mat& frame) -> cv::Mat;
 
-      auto Postprocess(const int original_height, const int original_width,
-                      const std::vector<float>& results,
+      void Postprocess(const int original_height, const int original_width,
+                      const cv::Mat& out,
                       std::vector<cv::Rect>& bboxes,
                       std::vector<float>& confidences,
-                      std::vector<int>& class_ids) -> std::vector<float>;
+                      std::vector<int>& class_ids);
 
       static auto GetObjectAngle(double object_position, double fov,
                                 int image_width = 640) -> double;
