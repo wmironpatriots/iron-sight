@@ -77,25 +77,19 @@ namespace localization {
             return {};
         }
 
-        std::vector<cv::Mat> rvecs, tvecs;
-        std::vector<double> reprojectionErrors;
+        cv::Mat rvec, tvec;
         cv::solvePnPGeneric(objectPoints, 
                             imagePoints, 
                             cameraMatrix, 
                             distCoeffs, 
-                            rvecs, 
-                            tvecs, 
+                            rvec, 
+                            tvec, 
                             false, 
-                            cv::SOLVEPNP_SQPNP, 
-                            cv::noArray(), 
-                            cv::noArray(), 
-                            reprojectionErrors);
+                            cv::SOLVEPNP_SQPNP);
 
-        for (int i = 0; i < rvecs.size(); i++) {
-                auto cameraPose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(rvecs[i], tvecs[i]));
-                auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
-                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, found_tags[0].timestampSeconds, reprojectionErrors[i]));
-        }
+        auto cameraPose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec));
+        auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
+        estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, found_tags[0].timestampSeconds, 0));
 
         return estimates;
     }

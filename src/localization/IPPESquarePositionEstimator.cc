@@ -63,27 +63,21 @@ namespace localization {
                     singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), 0);
                 }
 
-                std::vector<cv::Mat> rvecs, tvecs;
-                std::vector<double> reprojectionErrors;
+                cv::Mat rvec, tvec;
                 cv::solvePnPGeneric(singleTagObjectPoints, 
                                     singleTagImagePoints,
                                                 cameraMatrix, 
                                                 distCoeffs, 
-                                                rvecs, 
-                                                tvecs, 
+                                                rvec, 
+                                                tvec, 
                                                 false, 
-                                                cv::SOLVEPNP_IPPE_SQUARE, 
-                                                cv::noArray(), 
-                                                cv::noArray(), 
-                                                reprojectionErrors);
+                                                cv::SOLVEPNP_IPPE_SQUARE);
                 
+                auto tagToCamera = utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec).Inverse();
+                auto cameraPose = tagPose.value().TransformBy(tagToCamera);
+                auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
+                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestampSeconds, 0));
 
-                for (int i = 0; i < rvecs.size(); i++) {
-                    auto tagToCamera = utils::ConvertOpencvRvecTvecToWpiLibTransform(rvecs[i], tvecs[i]).Inverse();
-                    auto cameraPose = tagPose.value().TransformBy(tagToCamera);
-                    auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
-                    estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestampSeconds, reprojectionErrors[i]));
-                }
 
             } else {
 
