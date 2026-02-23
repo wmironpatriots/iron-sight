@@ -27,6 +27,8 @@ namespace localization {
 
     /** Represents a robot position estimate in 3D space (x, y, z) */
     using pose3d_estimate_t = struct Pose3dEstimate {
+        /** The tags used to derive the estimate */
+        std::vector<found_apriltag_t> tags;
         /** A Pose3d object storing the estimated pose */
         frc::Pose3d position;
         /** The timestamp in seconds representing and estimate of when the robot was at this position */
