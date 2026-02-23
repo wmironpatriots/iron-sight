@@ -29,13 +29,9 @@ namespace utils {
 
         printf("Waiting for Connection to %d\n", kTeamNumber);
         while (!kNtInstance.IsConnected()) {
-            std:std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
         printf("Connected!");
-    }
-
-    void PublishCameraStatus(const camera::Camera& camera) {
-        // TODO: Implement Logic
     }
 }

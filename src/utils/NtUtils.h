@@ -14,9 +14,6 @@
 #include <networktables/DoubleTopic.h>
 #include <networktables/Topic.h>
 #include <string>
-#include "src/camera/Camera.h"
-#include "src/localization/PositionEstimator.h"
-#include "src/utils/PCH.h"
 
 namespace utils {
     /** The default NetworkTables Instance */

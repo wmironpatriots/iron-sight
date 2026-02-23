@@ -16,6 +16,8 @@
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
 #include "src/localization/IPPESquarePositionEstimator.h"
+#include "src/utils/EstimatePublisher.h"
+#include "src/utils/NtUtils.h"
 #include <cmath>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
@@ -71,6 +73,8 @@ auto main() -> int {
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
     cv::namedWindow("2", cv::WINDOW_NORMAL);
 
+    utils::StartNetworkTables();
+    auto publisher = utils::EstimatePublisher("bruh");
 
     int count = 0;
     while (true) {
@@ -100,6 +104,7 @@ auto main() -> int {
             for (auto position : pose) {
                 auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
                 cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
+                publisher.publish(position);
             }
             for (auto position : squarepose) {
                 auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
