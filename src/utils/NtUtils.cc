@@ -9,6 +9,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Pose3d.h>
 #include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 #include <networktables/StructTopic.h>
 #include <frc/DataLogManager.h>
 #include <ntcore_cpp.h>
@@ -17,7 +18,7 @@
 #include <thread>
 
 namespace utils {
-    void StartNetworkTables() {
+    void StartNetworkTables(bool isSim) {
         nt::NetworkTableInstance instance = nt::NetworkTableInstance::GetDefault();
 
         instance.StopClient();
@@ -25,6 +26,7 @@ namespace utils {
 
         instance.StartClient4("iron-sight");
         instance.SetServerTeam(kTeamNumber);
+        if (isSim) instance.SetServer("127.0.0.1", nt::NetworkTableInstance::kDefaultPort4);
         instance.StartDSClient();
 
         // frc::DataLogManager::Start(kPrefix + "/logs");

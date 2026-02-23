@@ -41,7 +41,7 @@ namespace {
 }
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
-    2,
+    0,
     cv::CAP_V4L2,
     "MJPG",
     800,
@@ -73,7 +73,7 @@ auto main() -> int {
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
     cv::namedWindow("2", cv::WINDOW_NORMAL);
 
-    utils::StartNetworkTables();
+    utils::StartNetworkTables(true);
     auto publisher = utils::EstimatePublisher("bruh");
 
     int count = 0;
@@ -84,7 +84,7 @@ auto main() -> int {
         auto pose = poseEstimator.estimatePosition(detections);
         auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
-        if (!pose.empty()) publisher.publish(pose[0]);
+        if (!squarepose.empty()) publisher.publish(squarepose[0]);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;

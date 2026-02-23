@@ -14,7 +14,7 @@
 #include "src/localization/PositionEstimator.h"
 
 namespace utils {
-    EstimatePublisher::EstimatePublisher(const std::string& cameraName) : mTable(kNtInstance.GetTable(kPrefix + "/estimates/" + cameraName)){
+    EstimatePublisher::EstimatePublisher(const std::string& cameraName) : mTable(kNtInstance.GetTable("iron-sight/estimates/" + cameraName)){
         mPose3dPublisher = mTable->GetStructTopic<frc::Pose3d>("Pose3d").Publish();
         mPose2dPublisher = mTable->GetStructTopic<frc::Pose2d>("Pose2d").Publish();
 

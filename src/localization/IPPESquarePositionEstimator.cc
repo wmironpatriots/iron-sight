@@ -55,8 +55,12 @@ namespace localization {
                     singleTagImagePoints.emplace_back(tag.cornerCoords[i]);
                 }
 
+                auto cvTagPose = frc::CoordinateSystem::Convert(fieldLayout.GetTagPose(tag.tag_id).value(), frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
+
                 for (auto pose : kTagCorners) {
-                    singleTagObjectPoints.emplace_back(pose.X().value(), pose.Y().value(), 0);
+                    auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
+                    auto cornerPose = pose.TransformBy(cornerTransform);
+                    singleTagObjectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), 0);
                 }
 
                 std::vector<cv::Mat> rvecs, tvecs;

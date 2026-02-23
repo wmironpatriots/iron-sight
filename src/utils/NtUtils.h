@@ -33,5 +33,5 @@ namespace utils {
      * Create a NT4 client named 'iron-sight' and attempt
      * to connect it 
      */
-    void StartNetworkTables();
+    void StartNetworkTables(bool isSim);
 }
