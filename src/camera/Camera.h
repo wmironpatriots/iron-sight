@@ -13,8 +13,9 @@
 #include "src/utils/PCH.h"
 
 namespace camera {
+
     /** Camera frame recorded at a specified timestamp */
-    struct TimestampedFrame {
+    using timestamped_frame_t = struct timestamped_frame_t {
         /** Image data of the frame */
         cv::Mat frame;
         /** Match timestamp frame was recorded in */
@@ -28,8 +29,10 @@ namespace camera {
             /** Return camera configuration */
             virtual auto GetConfig() -> camera_config_t = 0;
             /** Return the latest timestamped frame recorded by camera */
-            virtual auto GetTimestampedFrame() -> TimestampedFrame = 0;
+            virtual auto GetTimestampedFrame() -> timestamped_frame_t = 0;
             /** Attempt to reinitialize camera */
             virtual auto Restart() -> void = 0;
+
     };
+
 }

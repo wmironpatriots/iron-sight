@@ -39,20 +39,20 @@ namespace camera {
         /** Friendly nickname for Camera */
         std::string nickname;
         /** Camera Identity */
-        int deviceId;
+        int device_id;
         /** API backend Camera should use */
-        int apiId;
+        int api_id;
         /** Codec Camera should use */
         std::string codec;
         /** Width of Camera Capture */
-        int captureWidth;
+        int capture_width;
         /** Height of Camera Capture */
-        int captureHeight;
+        int capture_height;
         /** FPS of Camera Capture */
-        int captureFPS;
+        int capture_fps;
         /** Displacement of Camera WRT to Center-of-chassis */
-        frc::Transform3d transformWrtChassis;
+        frc::Transform3d transform_wrt_chassis;
         /** Internal Characterization of Camera */
-        camera_intrinsics_t intrinsicsCalibration;
+        camera_intrinsics_t intrinsics_calibration;
     };
 }

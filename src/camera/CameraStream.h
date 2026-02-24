@@ -17,10 +17,10 @@ namespace camera {
         public:
             CameraStream(std::unique_ptr<CameraIO> IO);
             /** Return latest frame from stream */
-            auto getTimestampedFrame() -> TimestampedFrame;
+            auto GetTimestampedFrame() -> timestamped_frame_t;
         private:
             std::unique_ptr<CameraIO> io_;
-            TimestampedFrame timestamped_frame_;
+            timestamped_frame_t timestamped_frame_;
             std::thread thread_;
             std::mutex mutex_;
     };

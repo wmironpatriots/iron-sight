@@ -1,8 +1,8 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// File: AprilTagSearcher.h
-// Purpose: Define base AprilTagSearcher structs & class
+// File: TagSearcher.h
+// Purpose: Define the TagSearcherIO class and the structs it uses
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
@@ -14,9 +14,9 @@
 #include <apriltag/tag36h11.h>
 
 namespace localization {
-    /** Represents a found apriltag from a tframe */
+    /** An april tag found within a frame */
     using found_apriltag_t = struct FoundAprilTag {
-        /** The unique id of tag */
+        /** Identity of Tag as a unique integer */
         int tag_id;
         /** An array of each tag corner coordinate in pixels */
         std::array<cv::Point2d, 4> cornerCoords;
@@ -29,10 +29,10 @@ namespace localization {
     };
 
     /** An interface for finding AprilTags in frames */
-    class IAprilTagSearcher {
+    class TagSearcherIO {
         public:
-            virtual ~IAprilTagSearcher() = default;
+            virtual ~TagSearcherIO() = default;
             /** Returns a vector of found april tags from a timestamped frame */
-            virtual auto findTags(const camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> = 0;
+            virtual auto findTags(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> = 0;
     };
 }

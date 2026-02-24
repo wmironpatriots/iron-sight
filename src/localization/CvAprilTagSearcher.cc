@@ -20,7 +20,7 @@ namespace localization {
         td->refine_edges = true;
     };
 
-    auto CvAprilTagSearcher::findTags(const camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {
+    auto CvAprilTagSearcher::findTags(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> {
         if (tframe.frame.empty()) {
             return {};
         }

@@ -12,7 +12,7 @@
 
 namespace localization {
     // TODO
-    class CvAprilTagSearcher : public IAprilTagSearcher {
+    class CvAprilTagSearcher : public TagSearcher {
         public:
             CvAprilTagSearcher();
             ~CvAprilTagSearcher() override;
@@ -20,7 +20,7 @@ namespace localization {
             auto operator=(const CvAprilTagSearcher&) -> CvAprilTagSearcher& = delete;
             CvAprilTagSearcher(CvAprilTagSearcher&&) = delete;
             auto operator=(CvAprilTagSearcher&&) -> CvAprilTagSearcher& = delete;
-            auto findTags(const camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> override;
+            auto findTags(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> override;
         private:
             apriltag_family_t* tf;
             apriltag_detector_t* td;

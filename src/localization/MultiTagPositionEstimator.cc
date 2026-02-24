@@ -37,18 +37,18 @@
 namespace localization {
     MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig) : 
         fieldLayout(std::move(fieldLayout)), 
-        cameraWrtChassis(cameraConfig.transformWrtChassis),
+        cameraWrtChassis(cameraConfig.transform_wrt_chassis),
         cameraMatrix(utils::CameraMatrixFromIntrinsics(
-            cameraConfig.intrinsicsCalibration.fx,
-            cameraConfig.intrinsicsCalibration.fy, 
-            cameraConfig.intrinsicsCalibration.cx, 
-            cameraConfig.intrinsicsCalibration.cy)),
+            cameraConfig.intrinsics_calibration.fx,
+            cameraConfig.intrinsics_calibration.fy, 
+            cameraConfig.intrinsics_calibration.cx, 
+            cameraConfig.intrinsics_calibration.cy)),
         distCoeffs(utils::DistortionCoefficentsFromIntrinsics(
-            cameraConfig.intrinsicsCalibration.p1, 
-            cameraConfig.intrinsicsCalibration.p2, 
-            cameraConfig.intrinsicsCalibration.k1, 
-            cameraConfig.intrinsicsCalibration.k2, 
-            cameraConfig.intrinsicsCalibration.k3)) {};
+            cameraConfig.intrinsics_calibration.p1, 
+            cameraConfig.intrinsics_calibration.p2, 
+            cameraConfig.intrinsics_calibration.k1, 
+            cameraConfig.intrinsics_calibration.k2, 
+            cameraConfig.intrinsics_calibration.k3)) {};
 
     
     auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {

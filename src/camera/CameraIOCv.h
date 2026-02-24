@@ -19,15 +19,16 @@ namespace camera {
     /** CameraIO extension using OpenCV as backend */
     class CameraIOCv : public CameraIO {
         public:
-            CameraIOCv(const CameraConfig& config);            
+            CameraIOCv(const camera_config_t& config);            
             auto GetConfig() -> camera_config_t override;
             /** Return raw OpenCV Matrix */
             auto GetFrame() -> cv::Mat;
-            auto GetTimestampedFrame() -> TimestampedFrame override;
+            auto GetTimestampedFrame() -> timestamped_frame_t override;
             auto Restart() -> void override;
         private:
             CameraConfig config_;
             cv::VideoCapture camera_capture_;
             cv::Mat backup_img_;
     };
+
 }

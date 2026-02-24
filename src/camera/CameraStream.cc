@@ -9,13 +9,14 @@
 #include "src/camera/CameraStream.h"
 #include <fmt/base.h>
 #include <cstdio>
+#include "src/camera/Camera.h"
 
 namespace camera {
     CameraStream::CameraStream(std::unique_ptr<CameraIO> io) : io_(std::move(io)) {
         timestamped_frame_ = io_->GetTimestampedFrame();
 
         thread_ = std::thread([this] () -> void {
-            TimestampedFrame tframe;
+            timestamped_frame_t tframe;
             tframe = io_->GetTimestampedFrame();
 
             mutex_.lock();
@@ -24,9 +25,9 @@ namespace camera {
         });
     };
 
-    auto CameraStream::getTimestampedFrame() -> TimestampedFrame {
+    auto CameraStream::GetTimestampedFrame() -> timestamped_frame_t {
         mutex_.lock();
-            TimestampedFrame tframe = timestamped_frame_;
+            timestamped_frame_t tframe = timestamped_frame_;
         mutex_.unlock();
 
         auto currentTimestamp = frc::Timer::GetFPGATimestamp();

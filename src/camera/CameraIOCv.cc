@@ -11,19 +11,19 @@
 #include <opencv2/videoio.hpp>
 
 namespace camera {
-    CameraIOCv::CameraIOCv(const CameraConfig& config) {
+    CameraIOCv::CameraIOCv(const camera_config_t& config) {
         config_ = config;
 
-        camera_capture_ = cv::VideoCapture(config.deviceId, config.apiId);
+        camera_capture_ = cv::VideoCapture(config.device_id, config.api_id);
 
-        camera_capture_.set(cv::CAP_PROP_FRAME_WIDTH, config.captureWidth);
-        camera_capture_.set(cv::CAP_PROP_FRAME_HEIGHT, config.captureHeight); 
-        camera_capture_.set(cv::CAP_PROP_FPS, config.captureFPS);
+        camera_capture_.set(cv::CAP_PROP_FRAME_WIDTH, config.capture_width);
+        camera_capture_.set(cv::CAP_PROP_FRAME_HEIGHT, config.capture_height); 
+        camera_capture_.set(cv::CAP_PROP_FPS, config.capture_fps);
         std::string codec = config.codec;
         camera_capture_.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(codec[0], codec[1], codec[2], codec[3]));
 
         backup_img_ = cv::imread(kBackupImgPath);
-        cv::resize(backup_img_, backup_img_, cv::Size(config.captureWidth, config.captureHeight));
+        cv::resize(backup_img_, backup_img_, cv::Size(config.capture_width, config.capture_height));
 
         if (!camera_capture_.isOpened()) {
             printf("Error ~ Failed to open camera\n");
@@ -46,8 +46,8 @@ namespace camera {
         return frame;
     }
 
-    auto CameraIOCv::GetTimestampedFrame() -> TimestampedFrame {
-        TimestampedFrame tframe;
+    auto CameraIOCv::GetTimestampedFrame() -> timestamped_frame_t {
+        timestamped_frame_t tframe;
         tframe.frame = GetFrame();
         tframe.timestamp = frc::Timer::GetFPGATimestamp();
 
@@ -56,11 +56,11 @@ namespace camera {
 
     auto CameraIOCv::Restart() -> void {
         camera_capture_.release();
-        camera_capture_ = cv::VideoCapture(config_.deviceId, config_.apiId);
+        camera_capture_ = cv::VideoCapture(config_.device_id, config_.api_id);
 
-        camera_capture_.set(cv::CAP_PROP_FRAME_WIDTH, config_.captureWidth);
-        camera_capture_.set(cv::CAP_PROP_FRAME_HEIGHT, config_.captureHeight); 
-        camera_capture_.set(cv::CAP_PROP_FPS, config_.captureFPS);
+        camera_capture_.set(cv::CAP_PROP_FRAME_WIDTH, config_.capture_width);
+        camera_capture_.set(cv::CAP_PROP_FRAME_HEIGHT, config_.capture_height); 
+        camera_capture_.set(cv::CAP_PROP_FPS, config_.capture_fps);
         std::string codec = config_.codec;
         camera_capture_.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(codec[0], codec[1], codec[2], codec[3]));
     }

@@ -59,7 +59,7 @@ auto main() -> int {
 
     while (true) {
 
-        camera::TimestampedFrame tframe = camera.GetTimestampedFrame();
+        camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
         auto detections = searcher.findTags(tframe);
 
         for (const auto& detection : detections){

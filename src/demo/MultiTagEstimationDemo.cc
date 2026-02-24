@@ -80,7 +80,7 @@ auto main() -> int {
     int count = 0;
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
-        camera::TimestampedFrame tframe = camera.GetTimestampedFrame();
+        camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
         auto detections = searcher.findTags(tframe);
         auto pose = poseEstimator.estimatePosition(detections);
         //auto squarepose = squarePoseEstimator.estimatePosition(detections);
