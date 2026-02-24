@@ -31,14 +31,24 @@
 #include "src/localization/AprilTagSearcher.h"
 #include "src/localization/PositionEstimator.h"
 #include "units/length.h"
-#include "src/utils/VisionUtils.h"
-namespace localization {
+#include "src/utils/CalibrationUtils.h"
+#include "src/utils/GeometryUtils.h"
 
-    IPPESquarePositionEstimator::IPPESquarePositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig)
-                                                        : fieldLayout(std::move(fieldLayout)),
-                                                        cameraWrtChassis(cameraConfig.transformWrtChassis),
-                                                        cameraMatrix(utils::generateCameraMatrix(cameraConfig)),
-                                                        distCoeffs(utils::generateDistCoeffs(cameraConfig)) {};
+namespace localization {
+    IPPESquarePositionEstimator::IPPESquarePositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig) :
+        fieldLayout(std::move(fieldLayout)), 
+        cameraWrtChassis(cameraConfig.transformWrtChassis),
+        cameraMatrix(utils::CameraMatrixFromIntrinsics(
+            cameraConfig.intrinsicsCalibration.fx,
+            cameraConfig.intrinsicsCalibration.fy, 
+            cameraConfig.intrinsicsCalibration.cx, 
+            cameraConfig.intrinsicsCalibration.cy)),
+        distCoeffs(utils::DistortionCoefficentsFromIntrinsics(
+            cameraConfig.intrinsicsCalibration.p1, 
+            cameraConfig.intrinsicsCalibration.p2, 
+            cameraConfig.intrinsicsCalibration.k1, 
+            cameraConfig.intrinsicsCalibration.k2, 
+            cameraConfig.intrinsicsCalibration.k3)) {};
 
     
         auto IPPESquarePositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
@@ -69,7 +79,7 @@ namespace localization {
                                                 false, 
                                                 cv::SOLVEPNP_IPPE_SQUARE);
                 
-                auto cameraWrtTag = utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec);
+                auto cameraWrtTag = utils::OpenCvTransformToWpilibTransform(rvec, tvec);
                 auto cameraPose = tagPose.value().TransformBy(cameraWrtTag);
                 auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
                 estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestampSeconds, 0));
