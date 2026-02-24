@@ -2,7 +2,7 @@
 // https://github.com/wmironpatriots
 //
 // File: CameraStream.h
-// Purpose: Define camera streams
+// Purpose: Define CameraStream class
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
@@ -11,18 +11,16 @@
 #include "src/camera/Camera.h"
 
 namespace camera {
-    /** Represents a continious stream of timestamped frames from camera */
+    /** A continous stream of timestamped frames from a CameraIO */
     class CameraStream {
         public:
-            CameraStream(std::unique_ptr<Camera> IO);
-            /** Return lastest timestamped frame from stream */
+            CameraStream(std::unique_ptr<CameraIO> IO);
+            /** Return latest frame from stream */
             auto getTimestampedFrame() -> TimestampedFrame;
-            /** Return latest raw frame */
-            auto getFrame() -> cv::Mat;
         private:
-            std::unique_ptr<Camera> mIO;
-            TimestampedFrame mTimestampedFrame;
-            std::thread mThread;
-            std::mutex mMutex;
+            std::unique_ptr<CameraIO> io_;
+            TimestampedFrame timestamped_frame_;
+            std::thread thread_;
+            std::mutex mutex_;
     };
 }

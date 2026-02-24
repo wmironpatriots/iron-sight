@@ -37,6 +37,9 @@
 #include <wpilibc/frc/DataLogManager.h>
 #include <ntcore/networktables/NetworkTableInstance.h>
 #include <wpimath/frc/geometry/Pose3d.h>
+#include <wpimath/frc/geometry/Transform3d.h>
+#include <wpimath/frc/geometry/Translation3d.h>
+#include <wpimath/frc/geometry/Rotation3d.h>
 
 // JSON
 #include <nlohmann/json.hpp>
