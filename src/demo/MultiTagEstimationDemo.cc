@@ -11,7 +11,7 @@
 #include <frc/apriltag/AprilTagFields.h>
 #include "src/camera/Camera.h"
 #include "src/camera/CameraConfig.h"
-#include "src/camera/CameraCv.h"
+#include "src/camera/CameraIOCv.h"
 #include "src/camera/CameraStream.h"
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
@@ -41,6 +41,7 @@ namespace {
 }
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
+    "bessie",
     2,
     cv::CAP_V4L2,
     "MJPG",
@@ -62,7 +63,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 };
 
 auto main() -> int {
-    camera::CameraCv camera(kDemoCam);
+    camera::CameraIOCv camera(kDemoCam);
 
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
@@ -79,12 +80,12 @@ auto main() -> int {
     int count = 0;
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
-        camera::TimestampedFrame tframe = camera.getTimestampedFrame();
+        camera::TimestampedFrame tframe = camera.GetTimestampedFrame();
         auto detections = searcher.findTags(tframe);
         auto pose = poseEstimator.estimatePosition(detections);
-        auto squarepose = squarePoseEstimator.estimatePosition(detections);
+        //auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
-        if (!squarepose.empty()) publisher.publish(squarepose[0]);
+        if (!pose.empty()) publisher.publish(pose[0]);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
@@ -104,10 +105,10 @@ auto main() -> int {
                 auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
                 cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
             }
-            for (const auto& position : squarepose) {
-                auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
-                cv::circle(fieldImg, point, 15, cv::Scalar(255, 0, 0), -1);
-            }
+            //for (const auto& position : squarepose) {
+            //    auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
+            //    cv::circle(fieldImg, point, 15, cv::Scalar(255, 0, 0), -1);
+            //}
         }
 
         for (const auto& detection : detections){

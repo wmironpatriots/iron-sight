@@ -26,10 +26,10 @@ namespace camera {
         public:
             virtual ~CameraIO() = default;
             /** Return camera configuration */
-            virtual auto GetConfig() -> camera_config_t;
+            virtual auto GetConfig() -> camera_config_t = 0;
             /** Return the latest timestamped frame recorded by camera */
             virtual auto GetTimestampedFrame() -> TimestampedFrame = 0;
             /** Attempt to reinitialize camera */
-            virtual auto Restart() -> void;
+            virtual auto Restart() -> void = 0;
     };
 }

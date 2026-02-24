@@ -10,13 +10,33 @@
 
 #include <frc/Timer.h>
 #include "src/camera/Camera.h"
-#include "src/camera/CameraCv.h"
+#include "src/camera/CameraIOCv.h"
 #include "src/camera/CameraStream.h"
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
 #include <cmath>
 #include <opencv2/core/version.hpp>
-
+inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
+    "bessie",
+    2,
+    cv::CAP_V4L2,
+    "MJPG",
+    1280,
+    800,
+    120,
+    frc::Transform3d(),
+    camera::camera_intrinsics_t{
+        619.9026951017695,
+        372.2792812903024,
+        539.3898006061588,
+        539.0735059998198,
+        -0.3241468189388152,
+        0.10782527225392564,
+        -0.016410664585260946,
+        0.00013396458313481827,
+        -0.0002794187083645791
+    }
+};
 namespace {
 auto PumpGuiEventsAndGetKey() -> int {
 #if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
@@ -31,7 +51,7 @@ auto main() -> int {
     int camid;
     std::cout << "Enter camid: ";
     std::cin >> camid;
-    camera::CameraCv camera(camera::CameraConfig(camid, cv::CAP_V4L2, "MJPG", 800, 600, 100));
+    camera::CameraIOCv camera(kDemoCam);
     localization::CvAprilTagSearcher searcher;
 
     const std::string windowName = "AprilTag Detection Demo";
@@ -39,7 +59,7 @@ auto main() -> int {
 
     while (true) {
 
-        camera::TimestampedFrame tframe = camera.getTimestampedFrame();
+        camera::TimestampedFrame tframe = camera.GetTimestampedFrame();
         auto detections = searcher.findTags(tframe);
 
         for (const auto& detection : detections){
