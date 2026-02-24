@@ -2,30 +2,33 @@
 // https://github.com/wmironpatriots
 //
 // File: Camera.h
-// Purpose: Define camera structs & base camera class
+// Purpose: Define the CameraIO class and the structs it uses
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #pragma once
 
+#include "src/camera/CameraConfig.h"
 #include "src/utils/PCH.h"
 
 namespace camera {
-    /** Represents a camera frame recorded at a specified timestamp */
+    /** Camera frame recorded at a specified timestamp */
     struct TimestampedFrame {
-        /** Represents the recorded frame */
+        /** Image data of the frame */
         cv::Mat frame;
-        /** Timestamp representing when frame was captured */
+        /** Match timestamp frame was recorded in */
         units::second_t timestamp;
     };
 
-    /** Hardware interface for interacting with a camera */
-    class Camera {
+    /** Hardware Interface for interacting with a Camera */
+    class CameraIO {
         public:
-            virtual ~Camera() = default;
-            /** return dense matrix representing raw recorded frame */
-            virtual auto getFrame() -> cv::Mat = 0;
-            /** returns TimestampedFrame representing the frame recorded at a specific timestamp*/
-            virtual auto getTimestampedFrame() -> TimestampedFrame = 0;
+            virtual ~CameraIO() = default;
+            /** Return camera configuration */
+            virtual auto GetConfig() -> camera_config_t;
+            /** Return the latest timestamped frame recorded by camera */
+            virtual auto GetTimestampedFrame() -> TimestampedFrame = 0;
+            /** Attempt to reinitialize camera */
+            virtual auto Restart() -> void;
     };
 }
