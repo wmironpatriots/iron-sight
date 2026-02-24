@@ -2,7 +2,7 @@
 // https://github.com/wmironpatriots
 //
 // File: PCH.h
-// Purpose: Compile all headers at once for faster compile times
+// Purpose: Compile commonly use headers once for faster compile times
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
@@ -11,6 +11,7 @@
 
 // C++ Standard Library
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -40,6 +41,3 @@
 #include <wpimath/frc/geometry/Transform3d.h>
 #include <wpimath/frc/geometry/Translation3d.h>
 #include <wpimath/frc/geometry/Rotation3d.h>
-
-// JSON
-#include <nlohmann/json.hpp>

@@ -5,28 +5,19 @@
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
+
 #include "src/utils/NtUtils.h"
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Pose3d.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StructTopic.h>
-#include <frc/DataLogManager.h>
-#include <ntcore_cpp.h>
-#include <chrono>
-#include <memory>
-#include <thread>
 
 namespace utils {
-    void StartNetworkTables(bool isSim) {
-        nt::NetworkTableInstance instance = nt::NetworkTableInstance::GetDefault();
+    void StartNetworkTables(bool isSimulated) {
+        nt::NetworkTableInstance instance = kNtInstance;
 
         instance.StopClient();
         instance.StopLocal();
 
         instance.StartClient4("iron-sight");
         instance.SetServerTeam(kTeamNumber);
-        if (isSim) instance.SetServer("127.0.0.1", nt::NetworkTableInstance::kDefaultPort4);
+        if (isSimulated) instance.SetServer("127.0.0.1", nt::NetworkTableInstance::kDefaultPort4);
         instance.StartDSClient();
 
         // frc::DataLogManager::Start(kPrefix + "/logs");

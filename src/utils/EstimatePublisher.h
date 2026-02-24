@@ -14,7 +14,6 @@
 #include "src/localization/PositionEstimator.h"
 #include "src/utils/NtUtils.h"
 
-// TODO docs
 namespace utils {
     class EstimatePublisher {
         public:
