@@ -1,34 +1,9 @@
-// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
-// https://github.com/wmironpatriots
-//
-// File: MultiTagEstimationDemo
-// Purpose: Showcase position estimation using multiple tags
-// 
-// Open Source Software; you can modify and/or share it under the terms of
-// MIT license file in the root directory of this project
-// TODO cleanup
-
-#include <frc/apriltag/AprilTagFields.h>
-#include "src/camera/Camera.h"
+#include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
-#include "src/camera/CameraStream.h"
-#include "src/localization/CvAprilTagSearcher.h"
-#include "src/localization/MultiTagPositionEstimator.h"
-#include "src/localization/IPPESquarePositionEstimator.h"
-#include "src/localization/PositionEstimatePublisher.h"
-#include "src/utils/NtUtils.h"
-#include <cmath>
-#include <opencv2/core/mat.hpp>
-#include <opencv2/core/types.hpp>
-#include <opencv2/core/version.hpp>
-#include <chrono>
-#include <thread>
-#include <frc/smartdashboard/Field2d.h>
-#include <networktables/NetworkTableInstance.h>
-#include <frc/geometry/CoordinateSystem.h>
-#include <ntcore_cpp.h>
-#include <cstdlib>
+#include "src/localization/PositionEstimatorIOMultiTag.h"
+#include "src/localization/PositionEstimatorIOSingleTag.h"
+#include "src/localization/TagSearcherIOWpiLib.h"
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
@@ -55,7 +30,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 auto main() -> int {
     camera::CameraIOCv camera(kDemoCam);
 
-    localization::CvAprilTagSearcher searcher;
+    localization::TagSearcherIOWpiLib searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
@@ -64,9 +39,9 @@ auto main() -> int {
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
         camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
-        auto detections = searcher.findTags(tframe);
-        auto pose = poseEstimator.estimatePosition(detections);
-        auto squarepose = squarePoseEstimator.estimatePosition(detections);
+        auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
+        auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);
+        auto squarepose = squarePoseEstimator.Estimate3dPoseFromFoundTags(detections);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;

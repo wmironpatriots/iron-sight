@@ -1,21 +1,10 @@
-// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
-// https://github.com/wmironpatriots
-//
-// File: TagTrackingDemo.cc
-// Purpose: Showcase Apriltag tracking
-// 
-// Open Source Software; you can modify and/or share it under the terms of
-// MIT license file in the root directory of this project
-// TODO cleanup
-
-#include <frc/Timer.h>
-#include "src/camera/Camera.h"
+#include "src/utils/PCH.h"
+#include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
-#include "src/camera/CameraStream.h"
-#include "src/localization/CvAprilTagSearcher.h"
-#include "src/localization/MultiTagPositionEstimator.h"
-#include <cmath>
-#include <opencv2/core/version.hpp>
+#include "src/localization/PositionEstimatorIOMultiTag.h"
+#include "src/localization/PositionEstimatorIOSingleTag.h"
+#include "src/localization/TagSearcherIOWpiLib.h"
+
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
     2,
@@ -52,7 +41,7 @@ auto main() -> int {
     std::cout << "Enter camid: ";
     std::cin >> camid;
     camera::CameraIOCv camera(kDemoCam);
-    localization::CvAprilTagSearcher searcher;
+    localization::TagSearcherIOWpiLib searcher;
 
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
@@ -60,12 +49,12 @@ auto main() -> int {
     while (true) {
 
         camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
-        auto detections = searcher.findTags(tframe);
+        auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
 
         for (const auto& detection : detections){
             std::vector<cv::Point> corners;
-            corners.reserve(detection.cornerCoords.size());
-        for (const auto& corner : detection.cornerCoords) {
+            corners.reserve(detection.corner_coords.size());
+        for (const auto& corner : detection.corner_coords) {
                 corners.emplace_back(
                     static_cast<int>(std::lround(corner.x)),
                     static_cast<int>(std::lround(corner.y))
@@ -76,7 +65,7 @@ auto main() -> int {
             for (auto & corner : corners) {
                 cv::circle(tframe.frame, corner, 15, cv::Scalar(0, 0, 255), -1);
             }
-            cv::Point2d center = detection.center;
+            cv::Point2d center = detection.center_coords;
             cv::putText(tframe.frame, "ID: " + std::to_string(detection.tag_id),
                        center, cv::FONT_HERSHEY_SIMPLEX, 3,
                        cv::Scalar(255, 0, 0), 5);

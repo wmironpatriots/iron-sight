@@ -28,7 +28,7 @@
 #include <opencv4/opencv2/imgproc.hpp>
 
 // AprilTag
-#include "apriltag/frc/apriltag/AprilTagFieldLayout.h"
+#include <frc/apriltag/AprilTagFieldLayout.h>
 #include <apriltag/apriltag.h>
 #include <apriltag/tag36h11.h>
 
