@@ -15,6 +15,7 @@ namespace camera {
 class CameraStream {
  public:
   CameraStream(std::unique_ptr<Camera> IO);
+  ~CameraStream();
   /** Return lastest timestamped frame from stream */
   auto getTimestampedFrame() -> TimestampedFrame;
   /** Return latest raw frame */
