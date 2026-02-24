@@ -17,7 +17,7 @@ namespace localization {
         td->quad_decimate = 2.0;
         td->quad_sigma = 0.0;
         td->nthreads = 4;
-        td->refine_edges = false;
+        td->refine_edges = true;
     };
 
     auto CvAprilTagSearcher::findTags(const camera::TimestampedFrame& tframe) -> std::vector<found_apriltag_t> {

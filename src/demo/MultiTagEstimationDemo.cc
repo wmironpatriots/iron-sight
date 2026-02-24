@@ -44,8 +44,8 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     2,
     cv::CAP_V4L2,
     "MJPG",
+    1280,
     800,
-    600,
     120,
     frc::Transform3d(),
     camera::camera_intrinsics_t{
@@ -84,7 +84,7 @@ auto main() -> int {
         auto pose = poseEstimator.estimatePosition(detections);
         auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
-        if (!squarepose.empty()) publisher.publish(squarepose[0]);
+        if (!pose.empty()) publisher.publish(pose[0]);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
