@@ -43,7 +43,6 @@ namespace localization {
             auto& tag = tags.emplace_back();
 
             tag.tag_id = marker_ids[i];
-            tag.decision_margin = 0.0; // TODO ?
             tag.center_coords = marker_center[i];
             tag.timestamp_seconds = tframe.timestamp.value();
 

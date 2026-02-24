@@ -23,8 +23,6 @@ namespace localization {
         std::array<cv::Point2d, 4> corner_coords;
         /** When this tag was found */
         double timestamp_seconds;
-        /** Measure of the quality of the binary decoding process: the average difference between the intensity of a data bit versus the decision threshold */
-        float decision_margin;
     };
 
     /** Interface for finding tags within camera frames */

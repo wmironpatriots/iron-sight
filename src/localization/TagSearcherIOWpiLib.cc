@@ -49,7 +49,6 @@ namespace localization {
             
             auto& detection = tag_detections.emplace_back();
             detection.tag_id = single_detection->id;
-            detection.decision_margin = single_detection->decision_margin;
             detection.center_coords = cv::Point2d(single_detection->c[0], single_detection->c[1]);
             detection.timestamp_seconds = timestamp_seconds;
             
