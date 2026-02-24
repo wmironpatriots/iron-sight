@@ -5,6 +5,7 @@
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
+
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
 #include <opencv2/videoio.hpp>
