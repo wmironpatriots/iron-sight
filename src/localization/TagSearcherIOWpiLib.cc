@@ -1,7 +1,7 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
 //
-// Header: TagSearcherIOOfficial.h
+// Header: TagSearcherIOWpilib.h
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
@@ -21,13 +21,13 @@ namespace localization {
         tag_detector_->refine_edges = true;
     };
 
-    auto TagSearcherIOWpiLib::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tag_family_rame) -> std::vector<found_apriltag_t> {
-        if (tag_family_rame.frame.empty()) {
+    auto TagSearcherIOWpiLib::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> {
+        if (tframe.frame.empty()) {
             return {};
         }
         
         cv::Mat gray_frame;
-        cv::cvtColor(tag_family_rame.frame, gray_frame, cv::COLOR_BGR2GRAY); 
+        cv::cvtColor(tframe.frame, gray_frame, cv::COLOR_BGR2GRAY); 
 
         image_u8_t image {
         gray_frame.cols, 
@@ -40,7 +40,8 @@ namespace localization {
         const int detection_count = zarray_size(raw_detections);
         std::vector<found_apriltag_t> tag_detections{};
         tag_detections.reserve(static_cast<std::size_t>(detection_count));
-        const double timestamp_seconds = tag_family_rame.timestamp.value();
+        const double timestamp_seconds = tframe.timestamp.value();
+
 
         for (int i = 0; i < detection_count; i++){
             apriltag_detection_t* single_detection;
