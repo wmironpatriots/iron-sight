@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <opencv2/objdetect/aruco_detector.hpp>
-#include <opencv2/objdetect/aruco_dictionary.hpp>
 #include "src/localization/TagSearcherIO.h"
 #include "src/camera/Camera.h"
 #include "opencv2/aruco.hpp"

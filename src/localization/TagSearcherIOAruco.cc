@@ -27,6 +27,7 @@ namespace localization {
         cv::cvtColor(tframe.frame, gray_frame, cv::COLOR_BGR2GRAY); 
 
         // Create output vecs
+        int number_tags;
         std::vector<int> marker_ids;
         std::vector<cv::Point2f> marker_center;
         std::vector<std::vector<cv::Point2f>> marker_corners, rejected;
@@ -39,7 +40,8 @@ namespace localization {
 
         // Process output vecs into detection vec
         std::vector<found_apriltag_t> tags;
-        for (int i = 0; i < marker_ids.size(); i++) {
+        number_tags = marker_ids.size();
+        for (int i = 0; i < number_tags; i++) {
             auto& tag = tags.emplace_back();
 
             tag.tag_id = marker_ids[i];
