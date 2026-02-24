@@ -2,28 +2,24 @@
 // https://github.com/wmironpatriots
 //
 // File: CameraConfig.h
-// Purpose: Define structs for characterizing cameras
+// Purpose: Define CameraIO Configuration Structs
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #pragma once
 
-#include <frc/geometry/Rotation3d.h>
-#include <frc/geometry/Transform3d.h>
-#include <opencv2/core/types.hpp>
-#include <opencv2/videoio.hpp>
 #include "src/utils/PCH.h"
 
 namespace camera {
-    /** Represent the internal characteristics of a camera */
+    /** The internal characteristics of a camera */
     using camera_intrinsics_t = struct CameraIntrinsics {
-        /** Optical Center X coord in Pixels */
+        /** Optical-center X coordinate in Pixels */
         double cx;
-        /** Optical Center Y coord in Pixels */
+        /** Optical-center Y coordinate in Pixels */
         double cy;
-        /** Focal X Length in Pixels */
+        /** Focal X-Length in Pixels */
         double fx;
-        /** Focal Y Length in Pixels */
+        /** Focal Y-Length in Pixels */
         double fy;
         /** Radial Distortion Coefficent 1 */
         double k1;
@@ -37,23 +33,25 @@ namespace camera {
         double p2;
     };
 
-    /** Represents a camera  */
+    /** The configuration of a camera */
     using camera_config_t = struct CameraConfig {
-        /** camera id */
+        /** Friendly nickname for Camera */
+        std::string nickname;
+        /** Camera Identity */
         int deviceId;
-        /** API backend to use */
+        /** API backend Camera should use */
         int apiId;
-        /** Codec to use */
+        /** Codec Camera should use */
         std::string codec;
-        /** Width of capture */
+        /** Width of Camera Capture */
         int captureWidth;
-        /** Height of capture*/
+        /** Height of Camera Capture */
         int captureHeight;
-        /** FPS of capture */
+        /** FPS of Camera Capture */
         int captureFPS;
-        /** Represents the displacement of camera WRT chassis center */
+        /** Displacement of Camera WRT to Center-of-chassis */
         frc::Transform3d transformWrtChassis;
-        /** The internal characteristics of camera */
+        /** Internal Characterization of Camera */
         camera_intrinsics_t intrinsicsCalibration;
     };
 }
