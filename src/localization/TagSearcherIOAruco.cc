@@ -40,7 +40,7 @@ namespace localization {
 
         // Process output vecs into detection vec
         std::vector<found_apriltag_t> tags;
-        number_tags = marker_ids.size();
+        number_tags = static_cast<int>(marker_ids.size());
         for (int i = 0; i < number_tags; i++) {
             auto& tag = tags.emplace_back();
 
