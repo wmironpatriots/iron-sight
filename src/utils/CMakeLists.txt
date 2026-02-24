@@ -1,4 +1,4 @@
-add_library(utils NtUtils.cc CalibrationUtils.cc GeometryUtils.cc EstimatePublisher.cc) 
+add_library(utils NtUtils.cc CalibrationUtils.cc GeometryUtils.cc) 
 target_link_libraries(utils PUBLIC wpilibc)
 
 if(!ENABLE_CLANG_TIDY)

@@ -41,3 +41,8 @@
 #include <wpimath/frc/geometry/Transform3d.h>
 #include <wpimath/frc/geometry/Translation3d.h>
 #include <wpimath/frc/geometry/Rotation3d.h>
+
+// NetworkTables
+#include <networktables/NetworkTable.h>
+#include <networktables/StructTopic.h>
+#include <networktables/DoubleTopic.h>
