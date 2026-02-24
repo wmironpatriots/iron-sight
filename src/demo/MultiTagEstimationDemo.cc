@@ -68,8 +68,8 @@ auto main() -> int {
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
-    auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, kDemoCam);
-    auto squarePoseEstimator = localization::IPPESquarePositionEstimator(fieldLayout, kDemoCam);
+    auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
+    auto squarePoseEstimator = localization::PositionEstimatorIOSingleTag(fieldLayout, kDemoCam);
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);
     cv::namedWindow("2", cv::WINDOW_NORMAL);

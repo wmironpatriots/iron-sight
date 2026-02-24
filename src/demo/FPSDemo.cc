@@ -58,8 +58,8 @@ auto main() -> int {
     localization::CvAprilTagSearcher searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
-    auto poseEstimator = localization::MultiTagPositionEstimator(fieldLayout, kDemoCam);
-    auto squarePoseEstimator = localization::IPPESquarePositionEstimator(fieldLayout, kDemoCam);
+    auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
+    auto squarePoseEstimator = localization::PositionEstimatorIOSingleTag(fieldLayout, kDemoCam);
 
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
