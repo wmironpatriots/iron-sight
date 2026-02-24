@@ -84,7 +84,7 @@ auto main() -> int {
         auto pose = poseEstimator.estimatePosition(detections);
         auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
-        if (!pose.empty()) publisher.publish(pose[0]);
+        if (!squarepose.empty()) publisher.publish(squarepose[0]);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
