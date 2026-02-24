@@ -1,11 +1,11 @@
 #include "src/localization/PositionEstimatePublisher.h"
+#include "src/localization/TagSearcherIOAruco.h"
 #include "src/utils/NtUtils.h"
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
 #include "src/localization/PositionEstimatorIOMultiTag.h"
 #include "src/localization/PositionEstimatorIOSingleTag.h"
-#include "src/localization/TagSearcherIOWpiLib.h"
 
 namespace {
     auto PumpGuiEventsAndGetKey() -> int {
@@ -42,7 +42,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 auto main() -> int {
     camera::CameraIOCv camera(kDemoCam);
 
-    localization::TagSearcherIOWpiLib searcher;
+    localization::TagSearcherIOAruco searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
@@ -53,6 +53,7 @@ auto main() -> int {
 
     utils::StartNetworkTables(true);
     auto publisher = localization::PositionEstimatePublisher(kDemoCam);
+    auto squarePublisher = localization::PositionEstimatePublisher(kDemoCam);
 
     int count = 0;
     while (true) {
@@ -60,9 +61,9 @@ auto main() -> int {
         camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
         auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
         auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);
-        //auto squarepose = squarePoseEstimator.estimatePosition(detections);
-        cv::Mat fieldImg = cv::imread("./resources/field.png");
+        auto squarepose = squarePoseEstimator.Estimate3dPoseFromFoundTags(detections);
         if (!pose.empty()) publisher.Publish(pose[0]);
+        if (!squarepose.empty()) publisher.Publish(squarepose[0]);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
@@ -77,15 +78,6 @@ auto main() -> int {
                 
             }
             count++;
-
-            for (const auto& position : pose) {
-                auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
-                cv::circle(fieldImg, point, 15, cv::Scalar(0, 0, 255), -1);
-            }
-            //for (const auto& position : squarepose) {
-            //    auto point = cv::Point2d((position.position.X().value() / 16.540988) * fieldImg.cols, (position.position.Y().value() / 8.069326) * fieldImg.rows);
-            //    cv::circle(fieldImg, point, 15, cv::Scalar(255, 0, 0), -1);
-            //}
         }
 
         for (const auto& detection : detections){
@@ -109,7 +101,6 @@ auto main() -> int {
             
         }
     
-        cv::imshow(windowName, fieldImg);
         cv::imshow("2", tframe.frame);
         if (PumpGuiEventsAndGetKey() == 'q') {
             break;
