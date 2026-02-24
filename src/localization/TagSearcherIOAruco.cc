@@ -11,8 +11,23 @@
 namespace localization {
     TagSearcherIOAruco::TagSearcherIOAruco() {
         auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_36h11);
-        auto params = cv::aruco::DetectorParameters();
-
+        //params based off 971's code
+        cv::aruco::DetectorParameters params;
+        // Allow the adaptive threshold window to scale with the image so that tags
+        // at varying distances are reliably segmented.
+        params.adaptiveThreshWinSizeMin = 3;
+        params.adaptiveThreshWinSizeMax = 53;
+        params.adaptiveThreshWinSizeStep = 10;
+        // Tighten the minimum marker perimeter relative to image size so that tiny,
+        // unreliable blobs are rejected early.
+        params.minMarkerPerimeterRate = 0.02;
+        params.maxMarkerPerimeterRate = 4.0;
+        // Use corner refinement for sub-pixel accuracy, which improves downstream
+        // PnP accuracy.
+        params.cornerRefinementMethod = cv::aruco::CORNER_REFINE_SUBPIX;
+        params.cornerRefinementWinSize = 5;
+        params.cornerRefinementMaxIterations = 30;
+        params.cornerRefinementMinAccuracy = 0.1;
         detector_ = cv::aruco::ArucoDetector(dictionary, params);
     }
 
