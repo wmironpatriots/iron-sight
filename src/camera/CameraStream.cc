@@ -19,14 +19,14 @@ namespace camera {
             tframe = io_->GetTimestampedFrame();
 
             mutex_.lock();
-            timestamped_frame_ = tframe;
+                timestamped_frame_ = tframe;
             mutex_.unlock();
         });
     };
 
     auto CameraStream::getTimestampedFrame() -> TimestampedFrame {
         mutex_.lock();
-        TimestampedFrame tframe = timestamped_frame_;
+            TimestampedFrame tframe = timestamped_frame_;
         mutex_.unlock();
 
         auto currentTimestamp = frc::Timer::GetFPGATimestamp();
@@ -36,7 +36,7 @@ namespace camera {
             std::printf("%s has not updated recently; Attempting to restarting Camera!\n", nickname.c_str());
 
             mutex_.lock();
-            io_->Restart();
+                io_->Restart();
             mutex_.unlock();
         }
 
