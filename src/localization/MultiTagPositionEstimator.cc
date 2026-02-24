@@ -31,7 +31,8 @@
 #include "src/localization/AprilTagSearcher.h"
 #include "src/localization/PositionEstimator.h"
 #include "units/length.h"
-#include "src/utils/VisionUtils.h"
+#include "src/utils/CalibrationUtils.h"
+#include "src/utils/GeometryUtils.h"
 namespace localization {
 
     MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig)

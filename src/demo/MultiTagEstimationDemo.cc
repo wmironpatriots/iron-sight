@@ -16,7 +16,7 @@
 #include "src/localization/CvAprilTagSearcher.h"
 #include "src/localization/MultiTagPositionEstimator.h"
 #include "src/localization/IPPESquarePositionEstimator.h"
-#include "src/utils/EstimatePublisher.h"
+#include "src/localization/PositionEstimatePublisher.h"
 #include "src/utils/NtUtils.h"
 #include <cmath>
 #include <opencv2/core/mat.hpp>
@@ -75,7 +75,7 @@ auto main() -> int {
     cv::namedWindow("2", cv::WINDOW_NORMAL);
 
     utils::StartNetworkTables(true);
-    auto publisher = utils::EstimatePublisher("bruh");
+    auto publisher = localization::PositionEstimatePublisher(kDemoCam);
 
     int count = 0;
     while (true) {
@@ -85,7 +85,7 @@ auto main() -> int {
         auto pose = poseEstimator.estimatePosition(detections);
         //auto squarepose = squarePoseEstimator.estimatePosition(detections);
         cv::Mat fieldImg = cv::imread("./resources/field.png");
-        if (!pose.empty()) publisher.publish(pose[0]);
+        if (!pose.empty()) publisher.Publish(pose[0]);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
