@@ -62,7 +62,7 @@ namespace localization {
             if (tagPose != std::nullopt){
 
                 for (int i = 0; i < 4; i++){
-                    singleTagImagePoints.emplace_back(tag.cornerCoords[i]);
+                    singleTagImagePoints.emplace_back(tag.corner_coords[i]);
                 }
 
                 for (const auto& corner : kTagCorners) {
@@ -82,7 +82,7 @@ namespace localization {
                 auto cameraWrtTag = utils::OpenCvTransformToWpilibTransform(rvec, tvec);
                 auto cameraPose = tagPose.value().TransformBy(cameraWrtTag);
                 auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
-                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestampSeconds, 0));
+                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestamp_seconds, 0));
 
             } else {
 

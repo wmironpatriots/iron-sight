@@ -27,6 +27,10 @@
 #include <opencv4/opencv2/imgcodecs.hpp>
 #include <opencv4/opencv2/imgproc.hpp>
 
+// AprilTag
+#include <apriltag/apriltag.h>
+#include <apriltag/tag36h11.h>
+
 // Eigen
 #include <Eigen/Core>
 

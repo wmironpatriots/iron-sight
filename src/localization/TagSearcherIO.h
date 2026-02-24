@@ -6,33 +6,32 @@
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
+
 #pragma once
 
 #include "src/utils/PCH.h"
 #include "src/camera/Camera.h"
-#include <apriltag/apriltag.h>
-#include <apriltag/tag36h11.h>
 
 namespace localization {
     /** An april tag found within a frame */
     using found_apriltag_t = struct FoundAprilTag {
         /** Identity of Tag as a unique integer */
         int tag_id;
-        /** An array of each tag corner coordinate in pixels */
-        std::array<cv::Point2d, 4> cornerCoords;
-        /** The timestamp in seconds representing when this tag was viewed at this angle aka the timestamp of the timestamped_frame_t it was derived from */
-        double timestampSeconds;
-        /**The decision margin, "A measure of the quality of the binary decoding process: the average difference between the intensity of a data bit versus the decision threshold." */
+        /** Tag center coordinates in pixels */
+        cv::Point2d center_coords;
+        /** Tag corner coordinates in pixels */
+        std::array<cv::Point2d, 4> corner_coords;
+        /** When this tag was found */
+        double timestamp_seconds;
+        /** Measure of the quality of the binary decoding process: the average difference between the intensity of a data bit versus the decision threshold */
         float decision_margin;
-        /**The center of the detection in image pixel coordinates*/
-        cv::Point2d center;
     };
 
-    /** An interface for finding AprilTags in frames */
+    /** Interface for finding tags within camera frames */
     class TagSearcherIO {
         public:
             virtual ~TagSearcherIO() = default;
-            /** Returns a vector of found april tags from a timestamped frame */
-            virtual auto findTags(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> = 0;
+            /** Returns a vector of found tags within a timestamped frame */
+            virtual auto FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> = 0;
     };
 }
