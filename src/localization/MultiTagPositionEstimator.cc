@@ -33,16 +33,25 @@
 #include "units/length.h"
 #include "src/utils/CalibrationUtils.h"
 #include "src/utils/GeometryUtils.h"
-namespace localization {
 
-    MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig)
-                                                        : fieldLayout(std::move(fieldLayout)),
-                                                        cameraWrtChassis(cameraConfig.transformWrtChassis),
-                                                        cameraMatrix(utils::generateCameraMatrix(cameraConfig)),
-                                                        distCoeffs(utils::generateDistCoeffs(cameraConfig)) {};
+namespace localization {
+    MultiTagPositionEstimator::MultiTagPositionEstimator(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig) : 
+        fieldLayout(std::move(fieldLayout)), 
+        cameraWrtChassis(cameraConfig.transformWrtChassis),
+        cameraMatrix(utils::CameraMatrixFromIntrinsics(
+            cameraConfig.intrinsicsCalibration.fx,
+            cameraConfig.intrinsicsCalibration.fy, 
+            cameraConfig.intrinsicsCalibration.cx, 
+            cameraConfig.intrinsicsCalibration.cy)),
+        distCoeffs(utils::DistortionCoefficentsFromIntrinsics(
+            cameraConfig.intrinsicsCalibration.p1, 
+            cameraConfig.intrinsicsCalibration.p2, 
+            cameraConfig.intrinsicsCalibration.k1, 
+            cameraConfig.intrinsicsCalibration.k2, 
+            cameraConfig.intrinsicsCalibration.k3)) {};
 
     
-        auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
+    auto MultiTagPositionEstimator::estimatePosition(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
         std::vector<pose3d_estimate_t> estimates{};
 
         std::vector<cv::Point2d> imagePoints;
@@ -58,7 +67,7 @@ namespace localization {
                     imagePoints.emplace_back(tag.cornerCoords[i]);
                 }
 
-                auto cvTagPose = frc::CoordinateSystem::Convert(fieldLayout.GetTagPose(tag.tag_id).value(), frc::CoordinateSystem::NWU(), frc::CoordinateSystem::EDN());
+                auto cvTagPose = utils::WpilibCoordSysToOpenCvCoordSys(fieldLayout.GetTagPose(tag.tag_id).value());
 
                 for (auto pose : kTagCorners) {
                     auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
@@ -88,7 +97,7 @@ namespace localization {
                             false, 
                             cv::SOLVEPNP_SQPNP);
 
-        auto cameraPose = frc::Pose3d().TransformBy(utils::ConvertOpencvRvecTvecToWpiLibTransform(rvec, tvec));
+        auto cameraPose = frc::Pose3d().TransformBy(utils::OpenCvTransformToWpilibTransform(rvec, tvec));
         auto robotPose = cameraPose.TransformBy(cameraWrtChassis.Inverse());
         estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, found_tags[0].timestampSeconds, 0));
 
