@@ -11,7 +11,7 @@
 
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
-#include "src/localization/PositionEstimator.h"
+#include "src/localization/PositionEstimatorIO.h"
 
 namespace localization {
     /** Wrapper for a set of NetworkTables Publishers used to send a PositionEstimate */

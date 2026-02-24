@@ -14,7 +14,7 @@
 #include <opencv2/calib3d.hpp>
 
 namespace localization {
-    /** Sidge Length of Tags */
+    /** Side Length of Tags */
     constexpr units::length::meter_t kTagSideLength{0.1651};
 
     /** Coordinates of Tag Corners (TL, TR, BR, BL) */
