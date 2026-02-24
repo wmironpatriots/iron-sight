@@ -37,7 +37,8 @@ namespace localization {
 
         // Handle no detections
         if (marker_ids.empty()) return {};
-
+        marker_center.resize(marker_ids.size());
+        
         // Process output vecs into detection vec
         std::vector<found_apriltag_t> tags;
         number_tags = static_cast<int>(marker_ids.size());
