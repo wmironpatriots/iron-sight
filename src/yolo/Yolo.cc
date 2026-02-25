@@ -7,8 +7,8 @@
 
 namespace yolo {
 
-static cv::Mat Letterbox(const cv::Mat& img, int target_size, float& out_scale,
-                         int& out_pad_left, int& out_pad_top, bool swap_rb) {
+static auto Letterbox(const cv::Mat& img, int target_size, float& out_scale,
+                         int& out_pad_left, int& out_pad_top, bool swap_rb) -> cv::Mat{
   cv::Mat src = img;
 
   if (swap_rb) {
