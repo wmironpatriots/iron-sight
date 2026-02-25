@@ -7,6 +7,8 @@
 // MIT license file in the root directory of this project
 
 #include "src/localization/PositionEstimatorIOMultiTag.h"
+#include <frc/geometry/Rotation3d.h>
+#include "src/localization/PositionEstimatorIO.h"
 #include "src/utils/CalibrationUtils.h"
 #include "src/utils/GeometryUtils.h"
 
@@ -45,11 +47,11 @@ namespace localization {
                     imagePoints.emplace_back(tag.corner_coords[i]);
                 }
 
-                for (auto pose : kTagCorners) {
-                    auto cornerTransform = frc::Transform3d(cvPose.Translation(), cvPose.Rotation());
+                for (auto cornerPose : kTagCorners) {
+                    auto transform = frc::Transform3d(cornerPose.Translation(), frc::Rotation3d());
 
-                    auto cornerPose = pose.TransformBy(cornerTransform);
-                    objectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
+                    auto pose = cvPose.TransformBy(transform);
+                    objectPoints.emplace_back(pose.X().value(), pose.Y().value(), pose.Z().value());
                 }
 
             } else {
