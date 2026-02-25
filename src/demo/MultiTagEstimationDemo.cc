@@ -20,7 +20,7 @@ namespace {
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    0,
+    2,
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -41,7 +41,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 };
 inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
     "squarebessie",
-    0,
+    2,
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -64,7 +64,7 @@ inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
 auto main() -> int {
     camera::CameraIOCv camera(kDemoCam);
 
-    auto searcher = localization::TagSearcherIOWpiLib();
+    auto searcher = localization::TagSearcherIOAruco();
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);

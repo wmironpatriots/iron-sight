@@ -7,12 +7,14 @@
 // MIT license file in the root directory of this project
 
 #include "src/localization/TagSearcherIOAruco.h"
+#include <opencv2/objdetect/aruco_detector.hpp>
+#include <opencv2/objdetect/aruco_dictionary.hpp>
 
 namespace localization {
     TagSearcherIOAruco::TagSearcherIOAruco() {
         auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_36h11);
-        //params based off 971's code
-        cv::aruco::DetectorParameters params;
+
+        auto params = cv::aruco::DetectorParameters();
         // Allow the adaptive threshold window to scale with the image so that tags
         // at varying distances are reliably segmented.
         params.adaptiveThreshWinSizeMin = 3;
@@ -28,6 +30,7 @@ namespace localization {
         params.cornerRefinementWinSize = 5;
         params.cornerRefinementMaxIterations = 30;
         params.cornerRefinementMinAccuracy = 0.1;
+
         detector_ = cv::aruco::ArucoDetector(dictionary, params);
     }
 
@@ -64,11 +67,9 @@ namespace localization {
             tag.center_coords = marker_center[i];
             tag.timestamp_seconds = tframe.timestamp.value();
 
-            tag.corner_coords[0] = marker_corners[i][2];
-            tag.corner_coords[1] = marker_corners[i][3];
-            tag.corner_coords[2] = marker_corners[i][0];
-            tag.corner_coords[3] = marker_corners[i][1];
-
+            for (int j = 0; j < 4; j++) {
+                tag.corner_coords[j] = marker_corners[i][j];
+            }
         }
 
         return tags;

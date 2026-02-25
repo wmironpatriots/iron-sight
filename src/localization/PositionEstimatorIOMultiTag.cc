@@ -39,14 +39,15 @@ namespace localization {
 
             if (tagPose != std::nullopt){
 
+                auto cvPose = utils::WpilibCoordSysToOpenCvCoordSys(tagPose.value());
+
                 for (int i = 0; i < 4; i++){
                     imagePoints.emplace_back(tag.corner_coords[i]);
                 }
 
-                auto cvTagPose = utils::WpilibCoordSysToOpenCvCoordSys(field_layout_.GetTagPose(tag.tag_id).value());
-
                 for (auto pose : kTagCorners) {
-                    auto cornerTransform = frc::Transform3d(cvTagPose.Translation(), cvTagPose.Rotation());
+                    auto cornerTransform = frc::Transform3d(cvPose.Translation(), cvPose.Rotation());
+
                     auto cornerPose = pose.TransformBy(cornerTransform);
                     objectPoints.emplace_back(cornerPose.X().value(), cornerPose.Y().value(), cornerPose.Z().value());
                 }
