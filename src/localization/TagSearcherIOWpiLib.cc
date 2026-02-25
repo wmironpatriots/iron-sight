@@ -52,9 +52,10 @@ namespace localization {
             detection.center_coords = cv::Point2d(single_detection->c[0], single_detection->c[1]);
             detection.timestamp_seconds = timestamp_seconds;
             
-            for (int j = 0; j < 4; j++){
-                detection.corner_coords[j] = cv::Point2d(single_detection->p[j][0], single_detection->p[j][1]);
-            }
+            detection.corner_coords[0] = cv::Point2d(single_detection->p[3][0], single_detection->p[3][1]);
+            detection.corner_coords[1] = cv::Point2d(single_detection->p[2][0], single_detection->p[2][1]);
+            detection.corner_coords[2] = cv::Point2d(single_detection->p[1][0], single_detection->p[1][1]);
+            detection.corner_coords[3] = cv::Point2d(single_detection->p[0][0], single_detection->p[0][1]);
         }
         apriltag_detections_destroy(raw_detections);
         return tag_detections;

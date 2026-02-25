@@ -1,5 +1,6 @@
 #include "src/localization/PositionEstimatePublisher.h"
 #include "src/localization/TagSearcherIOAruco.h"
+#include "src/localization/TagSearcherIOWpiLib.h"
 #include "src/utils/NtUtils.h"
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
@@ -19,7 +20,7 @@ namespace {
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    2,
+    0,
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -40,7 +41,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 };
 inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
     "squarebessie",
-    2,
+    0,
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -63,7 +64,7 @@ inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
 auto main() -> int {
     camera::CameraIOCv camera(kDemoCam);
 
-    auto searcher = localization::TagSearcherIOAruco();
+    auto searcher = localization::TagSearcherIOWpiLib();
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
@@ -112,13 +113,29 @@ auto main() -> int {
             }
             std::vector<std::vector<cv::Point>> contours = {corners};
             cv::polylines(tframe.frame, contours, true, cv::Scalar(0, 255, 0), 7);
-            for (auto & corner : corners) {
-                cv::circle(tframe.frame, corner, 15, cv::Scalar(0, 0, 255), -1);
+            bool first = true;
+            for (size_t i = 0; i < corners.size(); ++i) {
+                auto& corner = corners[i];
+                if (first){
+                    cv::circle(tframe.frame, corner, 15, cv::Scalar(0, 255, 0), -1);
+                    first = false;
+                } else {
+                    cv::circle(tframe.frame, corner, 15, cv::Scalar(0, 0, 255), -1);
+                }
+                cv::putText(
+                    tframe.frame,
+                    std::to_string(i),
+                    cv::Point(corner.x + 18, corner.y - 18),
+                    cv::FONT_HERSHEY_SIMPLEX,
+                    1.0,
+                    cv::Scalar(255, 0, 0),
+                    3
+                );
             }
-            cv::Point2d center = detection.center_coords;
-            cv::putText(tframe.frame, "ID: " + std::to_string(detection.tag_id),
-                    center, cv::FONT_HERSHEY_SIMPLEX, 3,
-                    cv::Scalar(255, 0, 0), 5);
+            //cv::Point2d center = detection.center_coords;
+            //cv::putText(tframe.frame, "ID: " + std::to_string(detection.tag_id),
+            //        center, cv::FONT_HERSHEY_SIMPLEX, 3,
+            //        cv::Scalar(255, 0, 0), 5);
             
         }
     

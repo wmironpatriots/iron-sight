@@ -1,3 +1,4 @@
+#include "src/localization/TagSearcherIOAruco.h"
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
@@ -41,7 +42,7 @@ auto main() -> int {
     std::cout << "Enter camid: ";
     std::cin >> camid;
     camera::CameraIOCv camera(kDemoCam);
-    localization::TagSearcherIOWpiLib searcher;
+    localization::TagSearcherIOAruco searcher;
 
     const std::string windowName = "AprilTag Detection Demo";
     cv::namedWindow(windowName, cv::WINDOW_NORMAL);

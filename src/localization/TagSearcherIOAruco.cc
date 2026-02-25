@@ -64,9 +64,10 @@ namespace localization {
             tag.center_coords = marker_center[i];
             tag.timestamp_seconds = tframe.timestamp.value();
 
-            for (int j = 0; j < 4; j++) {
-                tag.corner_coords[j] = marker_corners[i][j];
-            }
+            tag.corner_coords[0] = marker_corners[i][2];
+            tag.corner_coords[1] = marker_corners[i][3];
+            tag.corner_coords[2] = marker_corners[i][0];
+            tag.corner_coords[3] = marker_corners[i][1];
 
         }
 

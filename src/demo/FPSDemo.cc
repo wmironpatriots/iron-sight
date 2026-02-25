@@ -1,3 +1,4 @@
+#include "src/localization/TagSearcherIOAruco.h"
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
@@ -30,7 +31,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 auto main() -> int {
     camera::CameraIOCv camera(kDemoCam);
 
-    localization::TagSearcherIOWpiLib searcher;
+    localization::TagSearcherIOAruco searcher;
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
