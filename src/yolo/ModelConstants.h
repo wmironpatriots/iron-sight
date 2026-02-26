@@ -36,7 +36,7 @@ using module_config_t = struct ModuleConfig {
         swap_rb(swap) {}
 };
 
-inline const module_config_t kAlphaModel{"iron-sight/models/best.onnx",
+inline const module_config_t kAlphaModel{"models/best.onnx",
                                          std::vector<std::string>{"fuel"}, 320,
                                          320, true};
 }  // namespace yolo

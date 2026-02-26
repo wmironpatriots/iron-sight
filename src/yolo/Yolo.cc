@@ -119,7 +119,7 @@ void Yolo::Postprocess(int original_height, int original_width,
   CV_Assert(out.size[1] == 5);
 
   const int N = out.size[2];
-  const float* data = out.ptr<float>();
+  const auto* data = out.ptr<float>();
 
   const float scale = std::min(TARGET_SIZE / (float)original_height,
                                TARGET_SIZE / (float)original_width);
