@@ -79,7 +79,8 @@ auto main() -> int {
     cv::Mat annotated = tframe.frame.clone();
     yolo::Yolo::DrawDetections(annotated, boxes, class_ids, confidences,
                                model_cfg.classes);
-
+    cv::Mat fixed;
+    cv::cvtColor(annotated, fixed, cv::COLOR_BGR2RGB);
     
     const auto end = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double> elapsed = end - start;
@@ -110,7 +111,7 @@ auto main() -> int {
       printCount++;
     }
 
-    cv::imshow(windowName, annotated);
+    cv::imshow(windowName, fixed);
 
     const int key = PumpGuiEventsAndGetKey();
     if (key == 'q' || key == 27) {  // q or ESC
