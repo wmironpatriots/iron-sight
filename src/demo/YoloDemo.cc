@@ -42,18 +42,15 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
                                 -0.0002794187083645791}};
 
 auto main() -> int {
-  // Camera
+  
   camera::CameraIOCv camera(kDemoCam);
 
-  // NetworkTables (optional; keep if you like the pattern)
-  //utils::StartNetworkTables(false);
+  
 
-  // YOLO model config (from your ModelConstants.h)
+  
   const yolo::module_config_t model_cfg = yolo::kAlphaModel;
 
-  // NOTE: model_cfg.path is whatever you set (currently "iron-sight/models/best.onnx")
-  // Make sure you run from a working directory where that relative path exists,
-  // OR change model_cfg.path to an absolute path.
+ 
   yolo::Yolo model(model_cfg.path, model_cfg.swap_rb, /*verbose=*/true);
 
   const std::string windowName = "YOLO Detection Demo";
@@ -83,7 +80,7 @@ auto main() -> int {
     yolo::Yolo::DrawDetections(annotated, boxes, class_ids, confidences,
                                model_cfg.classes);
 
-    // Example: print FPS + first detection center (like your console output style)
+    
     const auto end = std::chrono::high_resolution_clock::now();
     const std::chrono::duration<double> elapsed = end - start;
 
@@ -102,8 +99,7 @@ auto main() -> int {
         std::cerr << "First box w,h: (" << b.width << ", " << b.height << ")\n";
         std::cerr << "Conf: " << confidences[0] << "\n";
 
-        // If you know your camera horizontal FOV (radians), you can compute angle:
-        // Example placeholder: 70 degrees -> 1.22173 rad. Replace with your real HFOV.
+        
         constexpr double kHFovRad = 70.0 * (std::numbers::pi / 180.0);
         const double yaw =
             yolo::Yolo::GetObjectAngle(cx, kHFovRad, tframe.frame.cols);

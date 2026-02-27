@@ -118,9 +118,7 @@ void yolo::Yolo::Postprocess(int original_height, int original_width,
   CV_Assert(out.type() == CV_32F);
   CV_Assert(out.isContinuous());
 
-  // -----------------------------
-  // Recompute letterbox parameters
-  // -----------------------------
+  
   const float scale = std::min(TARGET_SIZE / (float)original_height,
                                TARGET_SIZE / (float)original_width);
   const int new_w = (int)std::round(original_width * scale);
@@ -128,11 +126,7 @@ void yolo::Yolo::Postprocess(int original_height, int original_width,
   const float pad_left = (TARGET_SIZE - new_w) / 2.0f;
   const float pad_top  = (TARGET_SIZE - new_h) / 2.0f;
 
-  // -----------------------------
-  // Figure out output shape
-  // YOLOv5 commonly: (1, N, 5+nc)
-  // Sometimes:       (N, 5+nc)
-  // -----------------------------
+  
   int rows = 0;
   int cols = 0;
 
@@ -218,9 +212,7 @@ void yolo::Yolo::Postprocess(int original_height, int original_width,
     raw_class_ids.emplace_back(best_cid);
   }
 
-  // -----------------------------
-  // NMS
-  // -----------------------------
+ 
   std::vector<int> kept;
   cv::dnn::NMSBoxes(raw_boxes, raw_scores, CONF_THRESH, NMS_THRESH, kept);
 
