@@ -64,6 +64,9 @@ auto Yolo::PreprocessImage(const cv::Mat& frame) -> cv::Mat {
   cv::Mat blob = cv::dnn::blobFromImage(padded, 1.0 / 255.0,
                                         cv::Size(TARGET_SIZE, TARGET_SIZE),
                                         cv::Scalar(), false, false, CV_32F);
+  std::cout << "blob dims=" << blob.dims << " shape=[";
+  for (int i = 0; i < blob.dims; i++) std::cout << blob.size[i] << (i+1<blob.dims?", ":"");
+  std::cout << "] type=" << blob.type() << "\n";
   return blob;
 }
 
@@ -102,60 +105,105 @@ void Yolo::Nms(const std::vector<cv::Rect>& boxes,
   cv::dnn::NMSBoxes(boxes, scores, score_thresh, nms_thresh, kept_indices);
 }
 
-void Yolo::Postprocess(int original_height, int original_width,
-                       const cv::Mat& out, std::vector<cv::Rect>& bboxes,
-                       std::vector<float>& confidences,
-                       std::vector<int>& class_ids) {
+void yolo::Yolo::Postprocess(int original_height, int original_width,
+                             const cv::Mat& out,
+                             std::vector<cv::Rect>& bboxes,
+                             std::vector<float>& confidences,
+                             std::vector<int>& class_ids) {
   bboxes.clear();
   confidences.clear();
   class_ids.clear();
 
-  if (out.empty())
-    return;
+  if (out.empty()) return;
   CV_Assert(out.type() == CV_32F);
   CV_Assert(out.isContinuous());
-  CV_Assert(out.dims == 3);
-  CV_Assert(out.size[0] == 1);
-  CV_Assert(out.size[1] == 5);
 
-  const int N = out.size[2];
-  const auto* data = out.ptr<float>();
-
+  // -----------------------------
+  // Recompute letterbox parameters
+  // -----------------------------
   const float scale = std::min(TARGET_SIZE / (float)original_height,
                                TARGET_SIZE / (float)original_width);
-
   const int new_w = (int)std::round(original_width * scale);
   const int new_h = (int)std::round(original_height * scale);
-
   const float pad_left = (TARGET_SIZE - new_w) / 2.0f;
-  const float pad_top = (TARGET_SIZE - new_h) / 2.0f;
+  const float pad_top  = (TARGET_SIZE - new_h) / 2.0f;
 
-  const float* cx_ptr = data + 0 * N;
-  const float* cy_ptr = data + 1 * N;
-  const float* w_ptr = data + 2 * N;
-  const float* h_ptr = data + 3 * N;
-  const float* s_ptr = data + 4 * N;
+  // -----------------------------
+  // Figure out output shape
+  // YOLOv5 commonly: (1, N, 5+nc)
+  // Sometimes:       (N, 5+nc)
+  // -----------------------------
+  int rows = 0;
+  int cols = 0;
+
+  if (out.dims == 3) {
+    // [1, N, C]
+    CV_Assert(out.size[0] == 1);
+    rows = out.size[1];
+    cols = out.size[2];
+  } else if (out.dims == 2) {
+    // [N, C]
+    rows = out.size[0];
+    cols = out.size[1];
+  } else {
+    // Unhandled
+    return;
+  }
+
+  // Need at least cx,cy,w,h,obj
+  if (cols < 6) return;
+
+  const int num_classes = cols - 5;  // after [cx,cy,w,h,obj]
+  const auto* data = out.ptr<float>();
 
   std::vector<cv::Rect> raw_boxes;
   std::vector<float> raw_scores;
-  raw_boxes.reserve(N);
-  raw_scores.reserve(N);
+  std::vector<int> raw_class_ids;
 
-  for (int i = 0; i < N; i++) {
-    const float score = s_ptr[i];
-    if (score < CONF_THRESH)
-      continue;
+  raw_boxes.reserve(rows);
+  raw_scores.reserve(rows);
+  raw_class_ids.reserve(rows);
 
-    float x1 = cx_ptr[i] - 0.5f * w_ptr[i];
-    float y1 = cy_ptr[i] - 0.5f * h_ptr[i];
-    float x2 = cx_ptr[i] + 0.5f * w_ptr[i];
-    float y2 = cy_ptr[i] + 0.5f * h_ptr[i];
+  // Helper to read row i, col j from contiguous out
+  auto at = [&](int i, int j) -> float {
+    return data[i * cols + j];
+  };
 
+  for (int i = 0; i < rows; ++i) {
+    const float cx = at(i, 0);
+    const float cy = at(i, 1);
+    const float w  = at(i, 2);
+    const float h  = at(i, 3);
+
+    const float obj_conf = at(i, 4);
+
+    // Find best class score
+    int best_cid = 0;
+    float best_cls = at(i, 5);  // first class score
+    for (int c = 1; c < num_classes; ++c) {
+      const float s = at(i, 5 + c);
+      if (s > best_cls) {
+        best_cls = s;
+        best_cid = c;
+      }
+    }
+
+    const float conf = obj_conf * best_cls;
+    if (conf < CONF_THRESH) continue;
+
+    // YOLOv5 gives center xywh in the letterboxed input coords
+    float x1 = cx - 0.5f * w;
+    float y1 = cy - 0.5f * h;
+    float x2 = cx + 0.5f * w;
+    float y2 = cy + 0.5f * h;
+
+    // Undo letterbox
     x1 = (x1 - pad_left) / scale;
     y1 = (y1 - pad_top) / scale;
     x2 = (x2 - pad_left) / scale;
     y2 = (y2 - pad_top) / scale;
 
+    // Clamp
     x1 = std::max(0.0f, std::min(x1, (float)original_width));
     y1 = std::max(0.0f, std::min(y1, (float)original_height));
     x2 = std::max(0.0f, std::min(x2, (float)original_width));
@@ -163,15 +211,18 @@ void Yolo::Postprocess(int original_height, int original_width,
 
     const float bw = x2 - x1;
     const float bh = y2 - y1;
-    if (bw <= 1.0f || bh <= 1.0f)
-      continue;
+    if (bw <= 1.0f || bh <= 1.0f) continue;
 
     raw_boxes.emplace_back((int)x1, (int)y1, (int)bw, (int)bh);
-    raw_scores.emplace_back(score);
+    raw_scores.emplace_back(conf);
+    raw_class_ids.emplace_back(best_cid);
   }
 
+  // -----------------------------
+  // NMS
+  // -----------------------------
   std::vector<int> kept;
-  Nms(raw_boxes, raw_scores, CONF_THRESH, NMS_THRESH, kept);
+  cv::dnn::NMSBoxes(raw_boxes, raw_scores, CONF_THRESH, NMS_THRESH, kept);
 
   bboxes.reserve(kept.size());
   confidences.reserve(kept.size());
@@ -180,7 +231,7 @@ void Yolo::Postprocess(int original_height, int original_width,
   for (int idx : kept) {
     bboxes.push_back(raw_boxes[idx]);
     confidences.push_back(raw_scores[idx]);
-    class_ids.push_back(0);  // one class: fuel
+    class_ids.push_back(raw_class_ids[idx]);
   }
 }
 

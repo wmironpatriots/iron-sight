@@ -33,7 +33,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "MJPG",
     1280,
     800,
-    120,
+    100,
     frc::Transform3d(),
     camera::camera_intrinsics_t{619.9026951017695, 372.2792812903024,
                                 539.3898006061588, 539.0735059998198,
@@ -46,7 +46,7 @@ auto main() -> int {
   camera::CameraIOCv camera(kDemoCam);
 
   // NetworkTables (optional; keep if you like the pattern)
-  utils::StartNetworkTables(true);
+  //utils::StartNetworkTables(false);
 
   // YOLO model config (from your ModelConstants.h)
   const yolo::module_config_t model_cfg = yolo::kAlphaModel;
