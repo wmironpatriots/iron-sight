@@ -42,7 +42,7 @@ void run_fuel_detect(yolo::Yolo& model,
                      camera::camera_config_t config,
                      nt::StructTopic<frc::Pose2d>& fuel_topic,
                      bool debug) {
-    camera::CameraIOCv stream(config);
+  camera::CameraIOCv stream(config);
   nt::StructPublisher<frc::Pose2d> fuel_pub = fuel_topic.Publish();
   cv::Mat color;
   std::vector<cv::Rect> bboxes(MAX_DETECTIONS);
@@ -53,7 +53,7 @@ void run_fuel_detect(yolo::Yolo& model,
   const float cam_cy = config.intrinsics_calibration.cy;
   const float focal_length_vertical = config.intrinsics_calibration.fy;
   const float focal_length_horizontal = config.intrinsics_calibration.fx;
-  const float cam_pitch = NULL; //TODO: fill this value when we actually mount the camera
+  const float cam_pitch = units::degree_t{45}; //TODO: fill this value when we actually mount the camera
   const frc::Transform3d cam_pose= config.transform_wrt_chassis;
 
   frc::Transform3d target_pose_cam_relative;
