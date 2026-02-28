@@ -1,9 +1,12 @@
+// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
+// https://github.com/wmironpatriots
+//
+// Header: yolo.h
+//
+// Open Source Software; you can modify and/or share it under the terms of
+// MIT license file in the root directory of this project
+
 #include "Yolo.h"
-#include <opencv2/core/hal/interface.h>
-#include <cmath>
-#include <iostream>
-#include <stdexcept>
-#include "src/utils/PCH.h"
 
 namespace yolo {
 
