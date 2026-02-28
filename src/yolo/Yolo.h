@@ -2,16 +2,13 @@
 // https://github.com/wmironpatriots
 //
 // File: Yolo.h
-// TODO purpose
+// Purpose: Run a yolo model
 //
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include "opencv4/opencv2/dnn/dnn.hpp"
 #include "src/utils/PCH.h"
 
 namespace yolo {
