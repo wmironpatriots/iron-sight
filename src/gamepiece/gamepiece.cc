@@ -4,6 +4,7 @@
 #include <frc/geometry/Transform3d.h>
 #include <networktables/StructTopic.h>
 #include <chrono>
+#include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -40,28 +41,27 @@ void run_fuel_detect(yolo::Yolo& model,
                      const std::vector<std::string>& class_names,
                      camera::camera_config_t config,
                      nt::StructTopic<frc::Pose2d>& fuel_topic,
-                     const nlohmann::json& intrinsics,
-                     const nlohmann::json& extrinsics, bool debug) {
+                     bool debug) {
     camera::CameraIOCv stream(config);
   nt::StructPublisher<frc::Pose2d> fuel_pub = fuel_topic.Publish();
   cv::Mat color;
   std::vector<cv::Rect> bboxes(MAX_DETECTIONS);
   std::vector<float> confidences(MAX_DETECTIONS);
   std::vector<int> class_ids(MAX_DETECTIONS);
-  const float pinhole_height = extrinsics["translation_z"];
-  const float cam_cx = intrinsics["cx"];
-  const float cam_cy = intrinsics["cy"];
-  const float focal_length_vertical = intrinsics["fy"].get<float>();
-  const float focal_length_horizontal = intrinsics["fx"].get<float>();
-  const float cam_pitch = extrinsics["rotation_y"];
-  const frc::Pose3d cam_pose{
+  const float pinhole_height = NULL; //TODO: fill this value when we actually mount the camera
+  const float cam_cx = config.intrinsics_calibration.cx;
+  const float cam_cy = config.intrinsics_calibration.cy;
+  const float focal_length_vertical = config.intrinsics_calibration.fy;
+  const float focal_length_horizontal = config.intrinsics_calibration.fx;
+  const float cam_pitch = NULL; //TODO: fill this value when we actually mount the camera
+  const frc::Pose3d cam_pose{ 
       frc::Translation3d{
-          units::meter_t{extrinsics["translation_x"].get<float>()},
-          units::meter_t{extrinsics["translation_y"].get<float>()},
-          units::meter_t{extrinsics["translation_z"].get<float>()}},
-      frc::Rotation3d{units::radian_t{extrinsics["rotation_x"].get<float>()},
-                      units::radian_t{extrinsics["rotation_y"].get<float>()},
-                      units::radian_t{extrinsics["rotation_z"].get<float>()}}};
+          units::meter_t{NULL},
+          units::meter_t{NULL},
+          units::meter_t{NULL},
+      frc::Rotation3d{units::radian_t{NULL},
+                      units::radian_t{NULL},
+                      units::radian_t{NULL}}}}; //TODO: fill this entire thing
 
   frc::Transform3d target_pose_cam_relative;
   frc::Pose3d target_pose_robot_relative;
