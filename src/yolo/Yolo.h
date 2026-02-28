@@ -37,7 +37,7 @@ class Yolo {
 
   static constexpr int TARGET_SIZE = 640;  //I have no clue if this is right
 
-  static constexpr float CONF_THRESH = 0.25f;
+  static constexpr float CONF_THRESH = 0.45f;
   static constexpr float NMS_THRESH = 0.45f;
 
  private:
