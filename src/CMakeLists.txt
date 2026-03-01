@@ -14,7 +14,7 @@ add_subdirectory(camera)
 add_subdirectory(utils)
 add_subdirectory(localization)
 add_subdirectory(demo)
-add_subdirectory(yolo)
+# add_subdirectory(yolo)
 
 # Binary for center cameras coproc
 add_executable(u1 u1_main.cc)

@@ -9,20 +9,21 @@
 
 #pragma once
 
+#include <units/length.h>
 #include "src/utils/PCH.h"
 #include "src/localization/TagSearcherIO.h"
 #include <opencv2/calib3d.hpp>
 
 namespace localization {
     /** Side Length of Tags */
-    constexpr units::length::meter_t kTagSideLength{0.1651};
+    constexpr auto kTagSideLength = 0.1651;
 
     /** Coordinates of Tag Corners (BR, BL, TL, TR) */
-    const std::vector<frc::Pose3d> kTagCorners = {
-        frc::Pose3d(-kTagSideLength / 2, kTagSideLength / 2, 0_m, frc::Rotation3d()),
-        frc::Pose3d(kTagSideLength / 2, kTagSideLength / 2, 0_m, frc::Rotation3d()),
-        frc::Pose3d(kTagSideLength / 2, -kTagSideLength / 2, 0_m, frc::Rotation3d()),
-        frc::Pose3d(-kTagSideLength / 2, -kTagSideLength / 2, 0_m, frc::Rotation3d())
+    const std::vector<cv::Vec3f> kTagCorners = {
+        cv::Vec3f(-kTagSideLength/2.f, kTagSideLength/2.f, 0),
+        cv::Vec3f(kTagSideLength/2.f, kTagSideLength/2.f, 0),
+        cv::Vec3f(kTagSideLength/2.f, -kTagSideLength/2.f, 0),
+        cv::Vec3f(-kTagSideLength/2.f, -kTagSideLength/2.f, 0)
     };
 
     /** An estimated position in 3-Dimensional space /w a confidence value */

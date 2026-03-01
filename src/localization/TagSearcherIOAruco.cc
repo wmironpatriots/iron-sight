@@ -68,6 +68,7 @@ namespace localization {
             tag.timestamp_seconds = tframe.timestamp.value();
 
             for (int j = 0; j < 4; j++) {
+                //opencv coords
                 tag.corner_coords[j] = marker_corners[i][j];
             }
         }

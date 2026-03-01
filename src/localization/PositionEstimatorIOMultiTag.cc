@@ -36,21 +36,23 @@ namespace localization {
         std::vector<cv::Point3d> objectPoints;
 
         for (found_apriltag_t tag : found_tags){
-
+            // tagPose: WPILIB coords
             auto tagPose = field_layout_.GetTagPose(tag.tag_id);
 
             if (tagPose != std::nullopt){
 
-                auto cvPose = utils::WpilibCoordSysToOpenCvCoordSys(tagPose.value());
+                //auto cvPose = utils::WpilibCoordSysToOpenCvCoordSys(tagPose.value());
 
                 for (int i = 0; i < 4; i++){
                     imagePoints.emplace_back(tag.corner_coords[i]);
                 }
 
-                for (auto cornerPose : kTagCorners) {
-                    auto transform = frc::Transform3d(cornerPose.Translation(), frc::Rotation3d());
+                for (int i = 0; i < 4; i++) {
+                    auto& cornerPose = kTagCorners[i]; 
+                    auto transform = utils::OpenCvCoordSysToWpilibCoordSys(frc::Transform3d(units::meter_t(cornerPose[0]), units::meter_t(cornerPose[1]), units::meter_t(cornerPose[2]), frc::Rotation3d()));
 
-                    auto pose = cvPose.TransformBy(transform);
+                    auto pose = utils::WpilibCoordSysToOpenCvCoordSys(tagPose.value().TransformBy(transform));
+
                     objectPoints.emplace_back(pose.X().value(), pose.Y().value(), pose.Z().value());
                 }
 

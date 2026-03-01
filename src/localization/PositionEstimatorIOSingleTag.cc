@@ -6,6 +6,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #include "src/localization/PositionEstimatorIOSingleTag.h"
+#include <opencv2/core.hpp>
+#include <opencv2/core/types.hpp>
+#include "src/localization/PositionEstimatorIO.h"
 #include "src/utils/CalibrationUtils.h"
 #include "src/utils/GeometryUtils.h"
 
@@ -31,8 +34,10 @@ namespace localization {
 
         for (const found_apriltag_t& tag : found_tags){
             auto tagPose = field_layout_.GetTagPose(tag.tag_id);
-            std::vector<cv::Point2d> singleTagImagePoints = {};
-            std::vector<cv::Point3d> singleTagObjectPoints = {};
+            std::vector<cv::Point2d> singleTagImagePoints;
+            std::vector<cv::Point3d> singleTagObjectPoints;
+            singleTagImagePoints.reserve(4);
+            singleTagObjectPoints.reserve(4);
 
             if (tagPose != std::nullopt){
 
@@ -40,8 +45,9 @@ namespace localization {
                     singleTagImagePoints.emplace_back(tag.corner_coords[i]);
                 }
 
-                for (const auto& corner : kTagCorners) {
-                    singleTagObjectPoints.emplace_back(corner.X().value(), corner.Y().value(), corner.Z().value());
+                for (int i = 0; i < 4; i++) {
+                    singleTagObjectPoints.emplace_back(kTagCorners[i][0], kTagCorners[i][1], 0);
+                    //singleTagObjectPoints.emplace_back(corner.X().value(), corner.Y().value(), corner.Z().value());
                 }
 
                 cv::Mat rvec, tvec;

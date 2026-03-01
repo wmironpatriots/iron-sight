@@ -23,7 +23,7 @@ add_executable(FPSDemo FPSDemo.cc)
 target_link_libraries(FPSDemo PRIVATE ${OpenCV_LIBS} wpilibc apriltag ntcore localization camera utils)
 
 # Demo executable for YOLO detection
-add_executable(YoloDemo YoloDemo.cc)
-target_link_libraries(YoloDemo PRIVATE ${OpenCV_LIBS} wpilibc ntcore localization camera utils yolo)
+#add_executable(YoloDemo YoloDemo.cc)
+#target_link_libraries(YoloDemo PRIVATE ${OpenCV_LIBS} wpilibc ntcore localization camera utils yolo)
 
 set(CMAKE_CXX_CLANG_TIDY "")
