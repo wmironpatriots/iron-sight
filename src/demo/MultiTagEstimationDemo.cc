@@ -64,7 +64,7 @@ inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
 auto main() -> int {
     camera::CameraIOCv camera(kDemoCam);
 
-    auto searcher = localization::TagSearcherIOAruco();
+    auto searcher = localization::TagSearcherIOWpiLib();
     const frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltAndyMark);
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(fieldLayout, kDemoCam);
