@@ -17,7 +17,7 @@ namespace utils {
 
         instance.StartClient4("iron-sight");
         instance.SetServerTeam(kTeamNumber);
-        if (isSimulated) instance.SetServer("192.168.69.45", nt::NetworkTableInstance::kDefaultPort4);
+        if (isSimulated) instance.SetServer("127.0.0.1", nt::NetworkTableInstance::kDefaultPort4);
         instance.StartDSClient();
 
         // frc::DataLogManager::Start(kPrefix + "/logs");
