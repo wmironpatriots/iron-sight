@@ -30,9 +30,9 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
     800,
     120,
     frc::Transform3d(
+        -12.255_in, 
         0.0_in, 
-        0.0_in, 
-        0.0_in, 
+        14.207_in, 
         frc::Rotation3d(
             0.0_rad,
             0.0_rad,
@@ -85,7 +85,7 @@ inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
 
 /** Entry Point */
 auto main() -> int {
-    utils::StartNetworkTables(false);
+    utils::StartNetworkTables(true);
 
     /* ~ CAMERA INIT ~ */
     std::printf("Initializing Front Camera (Bessie)");
@@ -116,4 +116,8 @@ auto main() -> int {
             if (!pose.empty()) publisher.Publish(pose[0]);
         }
     });
+
+    front_thread.join();
+
+    return 0;
 }
