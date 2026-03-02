@@ -17,11 +17,7 @@
 
 namespace {
 auto PumpGuiEventsAndGetKey() -> int {
-#if (CV_VERSION_MAJOR > 4) || (CV_VERSION_MAJOR == 4 && CV_VERSION_MINOR >= 5)
-  return cv::pollKey();
-#else
   return cv::waitKey(1);
-#endif
 }
 }  // namespace
 
