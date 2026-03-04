@@ -14,7 +14,7 @@ namespace camera {
     CameraIOCv::CameraIOCv(const camera_config_t& config) {
         config_ = config;
 
-        camera_capture_ = cv::VideoCapture(config.device_id, config.api_id);
+        camera_capture_ = cv::VideoCapture("/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index0");
 
         camera_capture_.set(cv::CAP_PROP_FRAME_WIDTH, config.capture_width);
         camera_capture_.set(cv::CAP_PROP_FRAME_HEIGHT, config.capture_height); 
