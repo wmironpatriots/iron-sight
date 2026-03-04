@@ -37,7 +37,7 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
         14.207_in, 
         frc::Rotation3d(
             0.0_rad,
-            0.523599_rad,
+            1.0472_rad,
             0.0_rad
         )
     ),
@@ -114,6 +114,7 @@ auto main() -> int {
     /* ~ THREAD INIT ~ */
     std::thread front_thread([&camera, &searcher, &poseEstimator, &squarePoseEstimator, &publisher] () -> void {
         while (true) {
+            auto start = std::chrono::high_resolution_clock::now();
             camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
             
             auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
@@ -123,6 +124,16 @@ auto main() -> int {
 
             if (squarepose.size() == 1) publisher.Publish(squarepose[0]);
             if (!pose.empty()) publisher.Publish(pose[0]);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsed = end - start;
+            std::system("clear");
+            std::cerr << "FPS: " << 1/elapsed.count() << "\n";
+            if (!pose.empty()){
+                std::cerr << pose[0].position.X().value() << "\n";
+                std::cerr << pose[0].position.Y().value() << "\n"; 
+                std::cerr << pose[0].position.Z().value() << "\n";
+                    
+            }
         }
     });
 
