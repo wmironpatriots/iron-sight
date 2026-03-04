@@ -1,6 +1,7 @@
 #include <frc/geometry/Rotation3d.h>
 #include <wpimath/frc/geometry/Transform3d.h>
 #include <cstdio>
+#include <opencv2/highgui.hpp>
 #include <thread>
 #include "src/localization/PositionEstimatePublisher.h"
 #include "src/localization/TagSearcherIOAruco.h"
@@ -35,7 +36,7 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
         14.207_in, 
         frc::Rotation3d(
             0.0_rad,
-            0.0_rad,
+            0.523599_rad,
             0.0_rad
         )
     ),
@@ -85,7 +86,7 @@ inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
 
 /** Entry Point */
 auto main() -> int {
-    utils::StartNetworkTables(true);
+    utils::StartNetworkTables(false);
 
     /* ~ CAMERA INIT ~ */
     std::printf("Initializing Front Camera (Bessie)");
@@ -98,6 +99,7 @@ auto main() -> int {
 
     auto poseEstimator = localization::PositionEstimatorIOMultiTag(kFieldLayout, kBessieConfig);
     auto squarePoseEstimator = localization::PositionEstimatorIOSingleTag(kFieldLayout, kBessieConfig);
+
 
     /* ~ PUBLISHER INIT ~ */
     auto publisher = localization::PositionEstimatePublisher(kBessieConfig);
