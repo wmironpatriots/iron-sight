@@ -1,6 +1,7 @@
 #include <frc/geometry/Rotation3d.h>
 #include <wpimath/frc/geometry/Transform3d.h>
 #include <cstdio>
+#include <iostream>
 #include <opencv2/highgui.hpp>
 #include <thread>
 #include "src/localization/PositionEstimatePublisher.h"
@@ -88,9 +89,15 @@ inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
 auto main() -> int {
     utils::StartNetworkTables(false);
 
+    camera::camera_config_t config = kBessieConfig;
+
+    std::cout << "Enter Id:";
+    
+    std::cin >> config.device_id;
+
     /* ~ CAMERA INIT ~ */
     std::printf("Initializing Front Camera (Bessie)");
-    camera::CameraIOCv camera(kBessieConfig);
+    camera::CameraIOCv camera(config);
 
     // TODO Elsie Init
 
