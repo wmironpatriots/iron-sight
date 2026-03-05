@@ -25,7 +25,7 @@ inline const frc::AprilTagFieldLayout kFieldLayout = frc::AprilTagFieldLayout::L
 // TODO intrinsics
 inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
     "bessie",
-    0,
+    "example",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -56,7 +56,7 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
 // TODO extrinsics & intrinsics
 inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
     "elsie",
-    1,
+    "example",
     cv::CAP_V4L2,
     "MJPG",
     1280,

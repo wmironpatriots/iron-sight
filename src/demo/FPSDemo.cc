@@ -8,7 +8,7 @@
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    2,
+    "example",
     cv::CAP_V4L2,
     "MJPG",
     800,

@@ -38,8 +38,8 @@ namespace camera {
     using camera_config_t = struct CameraConfig {
         /** Friendly nickname for Camera */
         std::string nickname;
-        /** Camera Identity */
-        int device_id;
+        /** Camera Identity (USB Port) */
+        std::string device_id;
         /** API backend Camera should use */
         int api_id;
         /** Codec Camera should use */

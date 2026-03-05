@@ -20,7 +20,7 @@ namespace {
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    2,
+    "example",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -41,7 +41,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 };
 inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
     "squarebessie",
-    2,
+    "example",
     cv::CAP_V4L2,
     "MJPG",
     1280,
