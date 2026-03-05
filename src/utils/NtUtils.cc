@@ -12,11 +12,12 @@ namespace utils {
     void StartNetworkTables(bool isSimulated) {
         nt::NetworkTableInstance instance = kNtInstance;
 
+        instance.StopServer();
         instance.StopClient();
-        instance.StopLocal();
 
         instance.StartClient4("iron-sight");
         instance.SetServerTeam(kTeamNumber);
+        instance.StartDSClient();
         if (isSimulated) instance.SetServer("127.0.0.1", nt::NetworkTableInstance::kDefaultPort4);
         instance.StartDSClient();
 
@@ -27,6 +28,6 @@ namespace utils {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-        printf("Connected!");
+        printf("Connected!\n");
     }
 }

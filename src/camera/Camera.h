@@ -19,7 +19,7 @@ namespace camera {
         /** Image data of the frame */
         cv::Mat frame;
         /** Match timestamp frame was recorded in */
-        units::second_t timestamp;
+        double timestamp_seconds;
     };
 
     /** Hardware Interface for interacting with a Camera */

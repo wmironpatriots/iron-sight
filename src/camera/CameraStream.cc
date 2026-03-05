@@ -32,7 +32,7 @@ namespace camera {
 
         auto currentTimestamp = frc::Timer::GetFPGATimestamp();
 
-        if (currentTimestamp.to<double>() - tframe.timestamp.to<double>() > 0.5) {
+        if (currentTimestamp.to<double>() - tframe.timestamp_seconds > 0.5) {
             const auto nickname = io_->GetConfig().nickname;
             std::printf("%s has not updated recently; Attempting to restarting Camera!\n", nickname.c_str());
 

@@ -87,7 +87,7 @@ inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
 
 /** Entry Point */
 auto main() -> int {
-    utils::StartNetworkTables(false);
+    utils::StartNetworkTables(true);
 
     camera::camera_config_t config = kBessieConfig;
 
@@ -116,7 +116,7 @@ auto main() -> int {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
             camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
-            
+
             auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
 
             auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);

@@ -41,8 +41,7 @@ namespace localization {
         const int detection_count = zarray_size(raw_detections);
         std::vector<found_apriltag_t> tag_detections{};
         tag_detections.reserve(static_cast<std::size_t>(detection_count));
-        const double timestamp_seconds = tframe.timestamp.value();
-
+        const double timestamp_seconds = tframe.timestamp_seconds;
 
         for (int i = 0; i < detection_count; i++){
             apriltag_detection_t* single_detection;
@@ -52,7 +51,6 @@ namespace localization {
             detection.tag_id = single_detection->id;
             detection.center_coords = cv::Point2d(single_detection->c[0], single_detection->c[1]);
             detection.timestamp_seconds = timestamp_seconds;
-            
             
             detection.corner_coords[0] = cv::Point2d(single_detection->p[1][0], single_detection->p[1][1]);
             detection.corner_coords[1] = cv::Point2d(single_detection->p[0][0], single_detection->p[0][1]);

@@ -65,7 +65,7 @@ namespace localization {
 
             tag.tag_id = marker_ids[i];
             tag.center_coords = marker_center[i];
-            tag.timestamp_seconds = tframe.timestamp.value();
+            tag.timestamp_seconds = tframe.timestamp_seconds;
 
             for (int j = 0; j < 4; j++) {
                 //opencv coords

@@ -8,6 +8,8 @@
 
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
+#include <frc/Timer.h>
+#include <cstdio>
 #include <opencv2/videoio.hpp>
 
 namespace camera {
@@ -49,7 +51,9 @@ namespace camera {
     auto CameraIOCv::GetTimestampedFrame() -> timestamped_frame_t {
         timestamped_frame_t tframe;
         tframe.frame = GetFrame();
-        tframe.timestamp = frc::Timer::GetFPGATimestamp();
+        tframe.timestamp_seconds = frc::Timer::GetFPGATimestamp().to<double>();
+
+        printf("%f\n", tframe.timestamp_seconds);
 
         return tframe;
     }
