@@ -2,7 +2,6 @@
 
 #include <frc/geometry/Pose2d.h>
 #include <networktables/StructTopic.h>
-#include <nlohmann/json.hpp>
 #include <vector>
 #include "src/camera/CameraStream.h" 
 #include "src/camera/CameraConfig.h"

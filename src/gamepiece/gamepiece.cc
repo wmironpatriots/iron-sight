@@ -48,7 +48,8 @@ void run_fuel_detect(yolo::Yolo& model,
   std::vector<cv::Rect> bboxes(MAX_DETECTIONS);
   std::vector<float> confidences(MAX_DETECTIONS);
   std::vector<int> class_ids(MAX_DETECTIONS);
-  const float pinhole_height = config.transform_wrt_chassis.getRotation(); //TODO: fill this value when we actually mount the camera
+  const float pinhole_height =
+    static_cast<float>(config.transform_wrt_chassis.Z().value()); //TODO: fill this value when we actually mount the camera
   const float cam_cx = config.intrinsics_calibration.cx;
   const float cam_cy = config.intrinsics_calibration.cy;
   const float focal_length_vertical = config.intrinsics_calibration.fy;

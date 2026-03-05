@@ -26,4 +26,8 @@ target_link_libraries(FPSDemo PRIVATE ${OpenCV_LIBS} wpilibc apriltag ntcore loc
 add_executable(YoloDemo YoloDemo.cc)
 target_link_libraries(YoloDemo PRIVATE ${OpenCV_LIBS} wpilibc ntcore localization camera utils yolo)
 
+# Demo executable for MultiTagPositionEstimator
+add_executable(FuelDemo GamepieceDemo.cc)
+target_link_libraries(FuelDemo PRIVATE ${OpenCV_LIBS} wpilibc ntcore localization camera utils yolo)
+
 set(CMAKE_CXX_CLANG_TIDY "")
