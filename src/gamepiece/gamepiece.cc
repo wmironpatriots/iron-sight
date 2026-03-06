@@ -1,25 +1,5 @@
 #include "gamepiece.h"
 
-#include <frc/geometry/Pose2d.h>
-#include <frc/geometry/Pose3d.h>
-#include <frc/geometry/Transform3d.h>
-#include <networktables/StructTopic.h>
-
-#include <chrono>
-#include <cstddef>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include <thread>
-#include <vector>
-
-#include "src/camera/CameraConfig.h"
-#include "src/camera/CameraIOCv.h"
-#include "src/camera/CameraStream.h"
-#include "src/utils/PCH.h"
-#include "src/yolo/Yolo.h"
-
 namespace gamepiece {
 static constexpr int MAX_DETECTIONS = 6;
 static std::mutex mutex;
@@ -129,9 +109,9 @@ void run_fuel_detect(yolo::Yolo& model,
       // fuel_pub.Set(robot_pose.ToPose2d());
 
       if (debug) {
-        const int cid = (i < class_ids.size()) ? class_ids[i] : 0;
+        const size_t cid = class_ids[i];
         const std::string name =
-            (cid >= 0 && cid < static_cast<int>(class_names.size()))
+            (cid < class_names.size())
                 ? class_names[cid]
                 : "fuel";
 
@@ -173,9 +153,9 @@ void run_fuel_detect_no_img(yolo::Yolo& model,
     const cv::Rect& box = bboxes[i];
     if (box.width <= 0 || box.height <= 0) continue;
 
-    const int cid = (i < class_ids.size()) ? class_ids[i] : 0;
+    const size_t cid = class_ids[i];
     const std::string name =
-        (cid >= 0 && cid < static_cast<int>(class_names.size()))
+        (cid < class_names.size())
             ? class_names[cid]
             : "fuel";
 

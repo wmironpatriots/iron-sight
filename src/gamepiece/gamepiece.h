@@ -1,11 +1,8 @@
 #pragma once
 
-#include <frc/geometry/Pose2d.h>
-#include <networktables/StructTopic.h>
-#include <vector>
-#include "src/camera/CameraStream.h" 
-#include "src/camera/CameraConfig.h"
 #include "src/utils/PCH.h"
+#include "src/camera/CameraStream.h" 
+#include "src/camera/CameraIOCv.h"
 #include "src/yolo/Yolo.h"
 
 namespace gamepiece {
