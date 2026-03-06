@@ -20,7 +20,7 @@ namespace {
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    "pci-0000:00:14.0-usb-0:1:1.0-video-index1",
+    "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index1",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -33,7 +33,7 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
 };
 inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
     "squarebessie",
-    "pci-0000:00:14.0-usb-0:1:1.0-video-index1",
+    "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index1",
     cv::CAP_V4L2,
     "MJPG",
     1280,
