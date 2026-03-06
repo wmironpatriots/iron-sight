@@ -20,7 +20,7 @@ namespace {
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    "example",
+    "pci-0000:00:14.0-usb-0:1:1.0-video-index1",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -28,20 +28,12 @@ inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     120,
     frc::Transform3d(),
     camera::camera_intrinsics_t{
-        619.9026951017695,
-        372.2792812903024,
-        539.3898006061588,
-        539.0735059998198,
-        -0.3241468189388152,
-        0.10782527225392564,
-        -0.016410664585260946,
-        0.00013396458313481827,
-        -0.0002794187083645791
+        905.3170039, 911.1504396, 657.5557039, 395.6922377, 0.03900401473, -0.04730924301, 0.0008530472724, 0.0004149018693, -0.01166402586
     }
 };
 inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
     "squarebessie",
-    "example",
+    "pci-0000:00:14.0-usb-0:1:1.0-video-index1",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -49,15 +41,7 @@ inline const camera::camera_config_t kDemoCam2 = camera::camera_config_t{
     120,
     frc::Transform3d(),
     camera::camera_intrinsics_t{
-        619.9026951017695,
-        372.2792812903024,
-        539.3898006061588,
-        539.0735059998198,
-        -0.3241468189388152,
-        0.10782527225392564,
-        -0.016410664585260946,
-        0.00013396458313481827,
-        -0.0002794187083645791
+    905.3170039, 911.1504396, 657.5557039, 395.6922377, 0.03900401473, -0.04730924301, 0.0008530472724, 0.0004149018693, -0.01166402586
     }
 };
 
