@@ -8,7 +8,7 @@
 
 inline const camera::camera_config_t kDemoCam = camera::camera_config_t{
     "bessie",
-    "example",
+    "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     800,
