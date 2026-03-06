@@ -10,13 +10,16 @@
 #include "src/camera/CameraIOCv.h"
 #include <frc/Timer.h>
 #include <cstdio>
+#include <filesystem>
 #include <opencv2/videoio.hpp>
 
 namespace camera {
     CameraIOCv::CameraIOCv(const camera_config_t& config) {
         config_ = config;
-        camera_capture_ = cv::VideoCapture(config.device_id, config.api_id);
-
+        std::string path = std::filesystem::read_symlink(config.device_id);
+        int camIndex = std::stoi(path.substr(5));
+        camera_capture_ = cv::VideoCapture(camIndex, config.api_id);
+        
         camera_capture_.set(cv::CAP_PROP_FRAME_WIDTH, config.capture_width);
         camera_capture_.set(cv::CAP_PROP_FRAME_HEIGHT, config.capture_height); 
         camera_capture_.set(cv::CAP_PROP_FPS, config.capture_fps);
