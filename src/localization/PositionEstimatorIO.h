@@ -36,6 +36,8 @@ namespace localization {
         double timestamp;
         /** The measured error in pixels */
         double variance;
+        /** The number of tags used to calculate this position */
+        int tagsUsed;
     };
 
     /** Interface for estimating the robot position from found tags */

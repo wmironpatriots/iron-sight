@@ -6,6 +6,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
 #include "src/localization/PositionEstimatorIOSingleTag.h"
+#include <opencv2/calib3d.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/core/types.hpp>
 #include "src/localization/PositionEstimatorIO.h"
@@ -50,20 +51,25 @@ namespace localization {
                     //singleTagObjectPoints.emplace_back(corner.X().value(), corner.Y().value(), corner.Z().value());
                 }
 
-                cv::Mat rvec, tvec;
-                cv::solvePnP(singleTagObjectPoints, 
-                                    singleTagImagePoints,
-                                                camera_matrix_, 
-                                                dist_coeffs_, 
-                                                rvec, 
-                                                tvec, 
-                                                false, 
-                                                cv::SOLVEPNP_IPPE_SQUARE);
+                std::vector<cv::Mat> rvecs;
+                std::vector<cv::Mat> tvecs;
+                cv::Mat reprojectionErrors;
+                cv::solvePnPGeneric(singleTagObjectPoints, 
+                                    singleTagImagePoints, 
+                                    camera_matrix_, 
+                                    dist_coeffs_, 
+                                    rvecs, 
+                                    tvecs, 
+                                    false, 
+                                    cv::SOLVEPNP_IPPE_SQUARE, 
+                                    cv::noArray(), 
+                                    cv::noArray(), 
+                                    reprojectionErrors);
                 
-                auto cameraWrtTag = utils::OpenCvTransformToWpilibTransform(rvec, tvec);
+                auto cameraWrtTag = utils::OpenCvTransformToWpilibTransform(rvecs[0], tvecs[0]);
                 auto cameraPose = tagPose.value().TransformBy(cameraWrtTag);
                 auto robotPose = cameraPose.TransformBy(camera_wrt_chassis_.Inverse());
-                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestamp_seconds, 0));
+                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestamp_seconds, reprojectionErrors.at<double>(0), 1));
 
             } else {
 

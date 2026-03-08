@@ -16,6 +16,7 @@ namespace localization {
 
         timestamp_publisher_ = table_->GetDoubleTopic("TimestampSeconds").Publish();
         variance_publisher_ = table_->GetDoubleTopic("Variance").Publish();
+        tags_used_publisher_ = table_->GetIntegerTopic("tagsUsed").Publish();
     }
 
     void PositionEstimatePublisher::Publish(const localization::pose3d_estimate_t& estimate) {
@@ -25,8 +26,8 @@ namespace localization {
             pose2d_publisher.Set(estimate.position.ToPose2d());
 
             timestamp_publisher_.Set(estimate.timestamp);
-            timestamp_publisher_.Set(estimate.variance);
-
+            variance_publisher_.Set(estimate.variance);
+            tags_used_publisher_.Set(estimate.tagsUsed);
         mutex_.unlock();
     }
 }

@@ -8,6 +8,8 @@
 
 #include "src/localization/PositionEstimatorIOMultiTag.h"
 #include <frc/geometry/Rotation3d.h>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/core/mat.hpp>
 #include "src/localization/PositionEstimatorIO.h"
 #include "src/utils/CalibrationUtils.h"
 #include "src/utils/GeometryUtils.h"
@@ -68,19 +70,25 @@ namespace localization {
             return {};
         }
 
-        cv::Mat rvec, tvec;
-        cv::solvePnP(objectPoints, 
+        
+        std::vector<cv::Mat> rvecs;
+        std::vector<cv::Mat> tvecs;
+        cv::Mat reprojectionErrors;
+        cv::solvePnPGeneric(objectPoints, 
                             imagePoints, 
                             camera_matrix_, 
                             dist_coeffs_, 
-                            rvec, 
-                            tvec, 
+                            rvecs, 
+                            tvecs, 
                             false, 
-                            cv::SOLVEPNP_SQPNP);
-
-        auto cameraPose = frc::Pose3d().TransformBy(utils::OpenCvTransformToWpilibTransform(rvec, tvec));
+                            cv::SOLVEPNP_SQPNP, 
+                            cv::noArray(), 
+                            cv::noArray(), 
+                            reprojectionErrors);
+        //solvePnPGeneric should order the poses by lower reprojection error first
+        auto cameraPose = frc::Pose3d().TransformBy(utils::OpenCvTransformToWpilibTransform(rvecs[0], tvecs[0]));
         auto robotPose = cameraPose.TransformBy(camera_wrt_chassis_.Inverse());
-        estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, found_tags[0].timestamp_seconds, 0));
+        estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, found_tags[0].timestamp_seconds, reprojectionErrors.at<double>(0), found_tags.size()));
 
         return estimates;
     }

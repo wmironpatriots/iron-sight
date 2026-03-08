@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <networktables/IntegerTopic.h>
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
 #include "src/localization/PositionEstimatorIO.h"
@@ -27,7 +28,7 @@ namespace localization {
             nt::StructPublisher<frc::Pose2d> pose2d_publisher;
             nt::DoublePublisher timestamp_publisher_;
             nt::DoublePublisher variance_publisher_;
-
+            nt::IntegerPublisher tags_used_publisher_;
             std::mutex mutex_;
     };
 }

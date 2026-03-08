@@ -1,2 +1,2 @@
-add_library(localization TagSearcherIOWpiLib.cc TagSearcherIOAruco.cc PositionEstimatorIOMultiTag.cc PositionEstimatorIOSingleTag.cc PositionEstimatePublisher.cc)
+add_library(localization TagSearcherIOWpiLib.cc TagSearcherIOAruco.cc PositionEstimatorIOMultiTag.cc PositionEstimatorIOSingleTag.cc PositionEstimatePublisher.cc PositionEstimatorIOCombined.cc)
 target_link_libraries(localization PUBLIC ${OpenCV_LIBS} wpilibc apriltag camera utils)
