@@ -11,6 +11,13 @@
 
 #include "src/utils/PCH.h"
 
+#pragma once
+
+#include <string>
+#include <vector>
+#include "opencv4/opencv2/dnn/dnn.hpp"
+#include "src/utils/PCH.h"
+
 namespace yolo {
 class Yolo {
  public:
@@ -34,7 +41,7 @@ class Yolo {
 
   static constexpr int TARGET_SIZE = 640;  //I have no clue if this is right
 
-  static constexpr float CONF_THRESH = 0.45f;
+  static constexpr float CONF_THRESH = 0.25f;
   static constexpr float NMS_THRESH = 0.45f;
 
  private:
