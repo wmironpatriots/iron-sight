@@ -36,7 +36,7 @@ using module_config_t = struct ModuleConfig {
         swap_rb(swap) {}
 };
 
-inline const module_config_t kAlphaModel{"models/yoloraider.onnx",
+inline const module_config_t kAlphaModel{"models/best_opencv.onnx",
                                          std::vector<std::string>{"fuel"}, 640,
                                          640, true};
 }  // namespace yolo
