@@ -5,6 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include <thread>
 #include "src/localization/PositionEstimatePublisher.h"
+#include "src/localization/PositionEstimatorIOCombined.h"
 #include "src/localization/TagSearcherIOAruco.h"
 #include "src/localization/TagSearcherIOWpiLib.h"
 #include "src/utils/NtUtils.h"
@@ -100,15 +101,14 @@ auto main() -> int {
     /* ~ SEARCHER/ESTIMATOR INIT ~ */
     auto searcher = localization::TagSearcherIOWpiLib();
 
-    auto poseEstimator = localization::PositionEstimatorIOMultiTag(kFieldLayout, kBessieConfig);
-    auto squarePoseEstimator = localization::PositionEstimatorIOSingleTag(kFieldLayout, kBessieConfig);
+    auto poseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kBessieConfig);
 
 
     /* ~ PUBLISHER INIT ~ */
     auto publisher = localization::PositionEstimatePublisher(kBessieConfig);
     
     /* ~ THREAD INIT ~ */
-    std::thread front_thread([&camera, &searcher, &poseEstimator, &squarePoseEstimator, &publisher] () -> void {
+    std::thread front_thread([&camera, &searcher, &poseEstimator, &publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
             camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
@@ -116,12 +116,12 @@ auto main() -> int {
             auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
 
             auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);
-            auto squarepose = squarePoseEstimator.Estimate3dPoseFromFoundTags(detections);
-
-            if (squarepose.size() == 1) publisher.Publish(squarepose[0]);
-            if (!pose.empty()) publisher.Publish(pose[0]);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
+            
+            if (!pose.empty()) {
+                publisher.Publish(pose[0], latency.count());
+            }
         }
     });
 

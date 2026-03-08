@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <networktables/DoubleTopic.h>
 #include <networktables/IntegerTopic.h>
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
@@ -20,7 +21,7 @@ namespace localization {
         public:
             PositionEstimatePublisher(const camera::CameraConfig& config);
             /** Send the components of a new 3d PositionEstimate */
-            void Publish(const localization::pose3d_estimate_t& estimate);
+            void Publish(const localization::pose3d_estimate_t& estimate, double latency);
         private:
             std::shared_ptr<nt::NetworkTable> table_;
 
@@ -29,6 +30,7 @@ namespace localization {
             nt::DoublePublisher timestamp_publisher_;
             nt::DoublePublisher variance_publisher_;
             nt::IntegerPublisher tags_used_publisher_;
+            nt::DoublePublisher latency_publisher_;
             std::mutex mutex_;
     };
 }

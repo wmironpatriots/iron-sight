@@ -34,16 +34,14 @@ namespace localization {
         singletag_position_estimator_(localization::PositionEstimatorIOSingleTag(field_layout_, cameraConfig)) {} 
     
     auto PositionEstimatorIOCombined::Estimate3dPoseFromFoundTags(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
+        if (found_tags.size() == 0){
+            return {};
+        }
 
-        std::vector<pose3d_estimate_t> estimates{};
+        else if (found_tags.size() == 1) {
+            return singletag_position_estimator_.Estimate3dPoseFromFoundTags(found_tags);
+        }
 
-        estimates.emplace_back(multitag_position_estimator_.Estimate3dPoseFromFoundTags(found_tags)[0]);
-
-        auto singleTagEstimates = singletag_position_estimator_.Estimate3dPoseFromFoundTags(found_tags);
-        estimates.insert(singleTagEstimates.end(),
-           std::make_move_iterator(singleTagEstimates.begin()),
-           std::make_move_iterator(singleTagEstimates.end()));
-
-        return estimates;
+        return multitag_position_estimator_.Estimate3dPoseFromFoundTags(found_tags);
     }
 }

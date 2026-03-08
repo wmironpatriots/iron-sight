@@ -16,10 +16,11 @@ namespace localization {
 
         timestamp_publisher_ = table_->GetDoubleTopic("TimestampSeconds").Publish();
         variance_publisher_ = table_->GetDoubleTopic("Variance").Publish();
-        tags_used_publisher_ = table_->GetIntegerTopic("tagsUsed").Publish();
+        tags_used_publisher_ = table_->GetIntegerTopic("TagsUsed").Publish();
+        latency_publisher_ = table_->GetDoubleTopic("Latency").Publish();
     }
 
-    void PositionEstimatePublisher::Publish(const localization::pose3d_estimate_t& estimate) {
+    void PositionEstimatePublisher::Publish(const localization::pose3d_estimate_t& estimate, double latency) {
         mutex_.lock();
 
             pose3d_publisher.Set(estimate.position);
@@ -28,6 +29,7 @@ namespace localization {
             timestamp_publisher_.Set(estimate.timestamp);
             variance_publisher_.Set(estimate.variance);
             tags_used_publisher_.Set(estimate.tagsUsed);
+            latency_publisher_.Set(latency);
         mutex_.unlock();
     }
 }

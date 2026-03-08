@@ -68,8 +68,8 @@ auto main() -> int {
         auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
         auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);
         auto squarepose = squarePoseEstimator.Estimate3dPoseFromFoundTags(detections);
-        if (!pose.empty()) publisher.Publish(pose[0]);
-        if (!squarepose.empty()) squarePublisher.Publish(squarepose[0]);
+        if (!pose.empty()) publisher.Publish(pose[0], 0.0);
+        if (!squarepose.empty()) squarePublisher.Publish(squarepose[0], 0.0);
 
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
