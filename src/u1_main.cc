@@ -37,7 +37,7 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
         14.207_in, 
         frc::Rotation3d(
             0.0_rad,
-            1.0472_rad,
+            -0.523599_rad,
             0.0_rad
         )
     ),
