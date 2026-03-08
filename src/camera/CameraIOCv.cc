@@ -8,7 +8,6 @@
 
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
-#include "src/utils/utils.h"
 #include <frc/Timer.h>
 #include <ntcore_cpp.h>
 #include <cstdio>
