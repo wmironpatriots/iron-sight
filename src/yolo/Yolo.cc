@@ -258,7 +258,7 @@ void Yolo::DrawDetections(cv::Mat& img, const std::vector<cv::Rect>& boxes,
 
     const int cid = class_ids[i];
     const std::string name =
-        (cid >= 0 && cid < (int)class_names.size()) ? class_names[cid] : "obj";
+        (cid >= 0 && std::abs(cid) < (int)class_names.size()) ? class_names[cid] : "obj";
 
     const std::string label = name + " " + cv::format("%.2f", confidences[i]);
 
