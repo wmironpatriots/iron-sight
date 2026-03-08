@@ -8,10 +8,13 @@
 
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
+#include "src/utils/utils.h"
 #include <frc/Timer.h>
+#include <ntcore_cpp.h>
 #include <cstdio>
 #include <filesystem>
 #include <opencv2/videoio.hpp>
+
 
 namespace camera {
     CameraIOCv::CameraIOCv(const camera_config_t& config) {
@@ -54,7 +57,12 @@ namespace camera {
     auto CameraIOCv::GetTimestampedFrame() -> timestamped_frame_t {
         timestamped_frame_t tframe;
         tframe.frame = GetFrame();
-        tframe.timestamp_seconds = frc::Timer::GetFPGATimestamp().to<double>();
+        auto ntTime = nt::Now();
+        auto serverOffset = nt::GetServerTimeOffset(nt::GetDefaultInstance()).value_or(0);
+        if (serverOffset == 0){
+            std::cout << "NetworkTable offset not found!";
+        }
+        tframe.timestamp_seconds = (ntTime + serverOffset) / 1000000.0;
 
         printf("%f\n", tframe.timestamp_seconds);
 

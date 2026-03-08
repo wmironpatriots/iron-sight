@@ -16,7 +16,7 @@
 #include <units/length.h>
 
 /**
-    A Script for the Orange Pi Unit connected to the Front and Back
+    A Script for the O̶r̶a̶n̶g̶e Rubik Pi Unit (thanks dasun) connected to the Front and Back
     Camera of FRC 6423's 2026 Robot
 */
 
@@ -91,10 +91,6 @@ auto main() -> int {
 
     camera::camera_config_t config = kBessieConfig;
 
-    std::cout << "Enter Id:";
-    
-    std::cin >> config.device_id;
-
     /* ~ CAMERA INIT ~ */
     std::printf("Initializing Front Camera (Bessie)");
     camera::CameraIOCv camera(config);
@@ -125,15 +121,7 @@ auto main() -> int {
             if (squarepose.size() == 1) publisher.Publish(squarepose[0]);
             if (!pose.empty()) publisher.Publish(pose[0]);
             auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double> elapsed = end - start;
-            std::system("clear");
-            std::cerr << "FPS: " << 1/elapsed.count() << "\n";
-            if (!pose.empty()){
-                std::cerr << pose[0].position.X().value() << "\n";
-                std::cerr << pose[0].position.Y().value() << "\n"; 
-                std::cerr << pose[0].position.Z().value() << "\n";
-                    
-            }
+            std::chrono::duration<double> latency = end - start;
         }
     });
 
