@@ -27,8 +27,8 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
-    1280,
     800,
+    600,
     120,
     frc::Transform3d(
         -12.255_in, 
@@ -55,11 +55,11 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
 // TODO extrinsics & intrinsics
 inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
     "elsie",
-    "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
+    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
-    1280,
     800,
+    600,
     120,
     frc::Transform3d(
         0.0_in, 
@@ -86,44 +86,64 @@ inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
 
 /** Entry Point */
 auto main() -> int {
-    utils::StartNetworkTables(true);
+    utils::StartNetworkTables(false);
 
-    camera::camera_config_t config = kBessieConfig;
-
+    camera::camera_config_t BessieConfig = kBessieConfig;
+    camera::camera_config_t ElsieConfig = kElsieConfig;
     /* ~ CAMERA INIT ~ */
     std::printf("Initializing Front Camera (Bessie)");
-    camera::CameraIOCv camera(config);
-
+    camera::CameraIOCv frontCamera(BessieConfig);
+    camera::CameraIOCv backCamera(ElsieConfig);
     // TODO Elsie Init
 
     /* ~ SEARCHER/ESTIMATOR INIT ~ */
-    auto searcher = localization::TagSearcherIOWpiLib();
+    auto frontSearcher = localization::TagSearcherIOWpiLib();
 
-    auto poseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kBessieConfig);
+    auto frontPoseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kBessieConfig);
+    
+    auto backSearcher = localization::TagSearcherIOWpiLib();
 
+    auto backPoseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kElsieConfig);
 
     /* ~ PUBLISHER INIT ~ */
-    auto publisher = localization::PositionEstimatePublisher(kBessieConfig);
-    
+    auto frontPublisher = localization::PositionEstimatePublisher(kBessieConfig);
+    auto backPublisher = localization::PositionEstimatePublisher(kElsieConfig);
     /* ~ THREAD INIT ~ */
-    std::thread front_thread([&camera, &searcher, &poseEstimator, &publisher] () -> void {
+    std::thread front_thread([&frontCamera, &frontSearcher, &frontPoseEstimator, &frontPublisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
-            camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
+            camera::timestamped_frame_t tframe = frontCamera.GetTimestampedFrame();
 
-            auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
+            auto detections = frontSearcher.FindTagsFromTimestampedFrame(tframe);
 
-            auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto pose = frontPoseEstimator.Estimate3dPoseFromFoundTags(detections);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                publisher.Publish(pose[0], latency.count());
+                frontPublisher.Publish(pose[0], latency.count());
+            }
+        }
+    });
+
+        std::thread back_thread([&backCamera, &frontSearcher, &frontPoseEstimator, &backPublisher] () -> void {
+        while (true) {
+            auto start = std::chrono::high_resolution_clock::now();
+            camera::timestamped_frame_t tframe = backCamera.GetTimestampedFrame();
+
+            auto detections = frontSearcher.FindTagsFromTimestampedFrame(tframe);
+
+            auto pose = frontPoseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> latency = end - start;
+            
+            if (!pose.empty()) {
+                backPublisher.Publish(pose[0], latency.count());
             }
         }
     });
 
     front_thread.join();
-
+    back_thread.join();
     return 0;
 }
