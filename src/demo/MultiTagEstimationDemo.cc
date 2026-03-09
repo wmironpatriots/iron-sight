@@ -66,8 +66,8 @@ auto main() -> int {
         auto start = std::chrono::high_resolution_clock::now();
         camera::timestamped_frame_t tframe = camera.GetTimestampedFrame();
         auto detections = searcher.FindTagsFromTimestampedFrame(tframe);
-        auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections);
-        auto squarepose = squarePoseEstimator.Estimate3dPoseFromFoundTags(detections);
+        auto pose = poseEstimator.Estimate3dPoseFromFoundTags(detections).found_tags;
+        auto squarepose = squarePoseEstimator.Estimate3dPoseFromFoundTags(detections).found_tags;
         if (!pose.empty()) publisher.Publish(pose[0], 0.0);
         if (!squarepose.empty()) squarePublisher.Publish(squarepose[0], 0.0);
 

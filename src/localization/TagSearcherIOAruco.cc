@@ -9,6 +9,7 @@
 #include "src/localization/TagSearcherIOAruco.h"
 #include <opencv2/objdetect/aruco_detector.hpp>
 #include <opencv2/objdetect/aruco_dictionary.hpp>
+#include "src/localization/TagSearcherIO.h"
 
 namespace localization {
     TagSearcherIOAruco::TagSearcherIOAruco() {
@@ -34,7 +35,7 @@ namespace localization {
         detector_ = cv::aruco::ArucoDetector(dictionary, params);
     }
 
-    auto TagSearcherIOAruco::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> {
+    auto TagSearcherIOAruco::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> found_apriltags_in_frame_t {
         // Handle Empty Frame
         if (tframe.frame.empty()) {
             return {};
@@ -58,14 +59,15 @@ namespace localization {
         marker_center.resize(marker_ids.size());
         
         // Process output vecs into detection vec
-        std::vector<found_apriltag_t> tags;
+        found_apriltags_in_frame_t tags;
+        tags.timestamp_seconds = tframe.timestamp_seconds;
         number_tags = static_cast<int>(marker_ids.size());
         for (int i = 0; i < number_tags; i++) {
-            auto& tag = tags.emplace_back();
+            auto& tag = tags.found_tags.emplace_back();
 
             tag.tag_id = marker_ids[i];
             tag.center_coords = marker_center[i];
-            tag.timestamp_seconds = tframe.timestamp_seconds;
+            //tag.timestamp_seconds = tframe.timestamp_seconds;
 
             for (int j = 0; j < 4; j++) {
                 //opencv coords

@@ -50,6 +50,7 @@ namespace camera {
         int capture_height;
         /** FPS of Camera Capture */
         int capture_fps;
+        
         /** Displacement of Camera WRT to Center-of-chassis */
         frc::Transform3d transform_wrt_chassis;
         /** Internal Characterization of Camera */

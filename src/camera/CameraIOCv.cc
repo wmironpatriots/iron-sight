@@ -61,7 +61,7 @@ namespace camera {
         }
         tframe.timestamp_seconds = (ntTime + serverOffset) / 1000000.0;
 
-        printf("%f\n", tframe.timestamp_seconds);
+        //printf("%f\n", tframe.timestamp_seconds);
 
         return tframe;
     }

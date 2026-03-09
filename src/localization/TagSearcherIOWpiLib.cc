@@ -8,6 +8,7 @@
 
 #include "src/localization/TagSearcherIOWpiLib.h"
 #include <opencv2/core/types.hpp>
+#include "src/localization/TagSearcherIO.h"
 
 namespace localization {
     TagSearcherIOWpiLib::TagSearcherIOWpiLib() {
@@ -22,7 +23,7 @@ namespace localization {
         tag_detector_->refine_edges = true;
     };
 
-    auto TagSearcherIOWpiLib::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> {
+    auto TagSearcherIOWpiLib::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> found_apriltags_in_frame_t {
         if (tframe.frame.empty()) {
             return {};
         }
@@ -39,18 +40,18 @@ namespace localization {
         
         zarray_t* raw_detections = apriltag_detector_detect(tag_detector_, &image);
         const int detection_count = zarray_size(raw_detections);
-        std::vector<found_apriltag_t> tag_detections{};
-        tag_detections.reserve(static_cast<std::size_t>(detection_count));
-        const double timestamp_seconds = tframe.timestamp_seconds;
-
+        found_apriltags_in_frame_t tag_detections{};
+        tag_detections.found_tags.reserve(static_cast<std::size_t>(detection_count));
+        if (detection_count < 1) return {};
+        tag_detections.timestamp_seconds = tframe.timestamp_seconds;
         for (int i = 0; i < detection_count; i++){
             apriltag_detection_t* single_detection;
             zarray_get(raw_detections, i, &single_detection);
             
-            auto& detection = tag_detections.emplace_back();
+            auto& detection = tag_detections.found_tags.emplace_back();
             detection.tag_id = single_detection->id;
             detection.center_coords = cv::Point2d(single_detection->c[0], single_detection->c[1]);
-            detection.timestamp_seconds = timestamp_seconds;
+            
             
             detection.corner_coords[0] = cv::Point2d(single_detection->p[1][0], single_detection->p[1][1]);
             detection.corner_coords[1] = cv::Point2d(single_detection->p[0][0], single_detection->p[0][1]);

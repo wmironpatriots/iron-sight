@@ -12,8 +12,6 @@
 #include "src/utils/PCH.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
-#include "src/localization/PositionEstimatorIOMultiTag.h"
-#include "src/localization/PositionEstimatorIOSingleTag.h"
 #include <units/length.h>
 
 /**

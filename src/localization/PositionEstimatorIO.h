@@ -28,8 +28,6 @@ namespace localization {
 
     /** An estimated position in 3-Dimensional space /w a confidence value */
     using pose3d_estimate_t = struct Pose3dEstimate {
-        /** Tags used to derive the estimate */
-        std::vector<found_apriltag_t> tags;
         /** The position estimated in 3-Dimensional space */
         frc::Pose3d position;
         /** When the robot was estimated to be in this position */
@@ -45,6 +43,6 @@ namespace localization {
         public:
             virtual ~PositionEstimatorIO() = default;
             /** Returns 3-Dimensional position estimates from a vector of found tags */
-            virtual auto Estimate3dPoseFromFoundTags(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> = 0;
+            virtual auto Estimate3dPoseFromFoundTags(const found_apriltags_in_frame_t& found_tags) -> std::vector<pose3d_estimate_t> = 0;
     };
 }

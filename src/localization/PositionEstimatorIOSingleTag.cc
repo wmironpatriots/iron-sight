@@ -10,6 +10,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/types.hpp>
 #include "src/localization/PositionEstimatorIO.h"
+#include "src/localization/TagSearcherIO.h"
 #include "src/utils/CalibrationUtils.h"
 #include "src/utils/GeometryUtils.h"
 
@@ -30,10 +31,10 @@ namespace localization {
             cameraConfig.intrinsics_calibration.k3)) {};
 
     
-    auto PositionEstimatorIOSingleTag::Estimate3dPoseFromFoundTags(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
+    auto PositionEstimatorIOSingleTag::Estimate3dPoseFromFoundTags(const found_apriltags_in_frame_t& found_tags) -> std::vector<pose3d_estimate_t> {
         std::vector<pose3d_estimate_t> estimates{};
 
-        for (const found_apriltag_t& tag : found_tags){
+        for (const found_apriltag_t& tag : found_tags.found_tags){
             auto tagPose = field_layout_.GetTagPose(tag.tag_id);
             std::vector<cv::Point2d> singleTagImagePoints;
             std::vector<cv::Point3d> singleTagObjectPoints;
@@ -69,7 +70,7 @@ namespace localization {
                 auto cameraWrtTag = utils::OpenCvTransformToWpilibTransform(rvecs[0], tvecs[0]);
                 auto cameraPose = tagPose.value().TransformBy(cameraWrtTag);
                 auto robotPose = cameraPose.TransformBy(camera_wrt_chassis_.Inverse());
-                estimates.emplace_back(pose3d_estimate_t(found_tags, robotPose, tag.timestamp_seconds, reprojectionErrors.at<double>(0), 1));
+                estimates.emplace_back(pose3d_estimate_t(robotPose, found_tags.timestamp_seconds, reprojectionErrors.at<double>(0), 1));
 
             } else {
 

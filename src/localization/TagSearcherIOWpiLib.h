@@ -18,7 +18,7 @@ namespace localization {
         public:
             TagSearcherIOWpiLib();
             ~TagSearcherIOWpiLib() override;
-            auto FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> std::vector<found_apriltag_t> override;
+            auto FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> found_apriltags_in_frame_t override;
         private:
             apriltag_family_t* tag_family_;
             apriltag_detector_t* tag_detector_;

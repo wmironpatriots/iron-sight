@@ -12,13 +12,14 @@
 #include "src/localization/PositionEstimatorIOSingleTag.h"
 #include <frc/geometry/Rotation3d.h>
 #include "src/localization/PositionEstimatorIO.h"
+#include "src/localization/TagSearcherIO.h"
 
 namespace localization {
     /** A PositionEstimator that finds the optimal position estimator to use */
     class PositionEstimatorIOCombined : public PositionEstimatorIO {
         public:
             PositionEstimatorIOCombined(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig);
-            auto Estimate3dPoseFromFoundTags(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> override;
+            auto Estimate3dPoseFromFoundTags(const found_apriltags_in_frame_t& found_tags) -> std::vector<pose3d_estimate_t> override;
         private:
             frc::AprilTagFieldLayout field_layout_;
             frc::Transform3d camera_wrt_chassis_;

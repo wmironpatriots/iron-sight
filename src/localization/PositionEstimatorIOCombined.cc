@@ -13,6 +13,7 @@
 #include "src/localization/PositionEstimatorIO.h"
 #include "src/localization/PositionEstimatorIOMultiTag.h"
 #include "src/localization/PositionEstimatorIOSingleTag.h"
+#include "src/localization/TagSearcherIO.h"
 #include "src/utils/CalibrationUtils.h"
 
 namespace localization {
@@ -33,12 +34,12 @@ namespace localization {
         multitag_position_estimator_(localization::PositionEstimatorIOMultiTag(field_layout_, cameraConfig)),
         singletag_position_estimator_(localization::PositionEstimatorIOSingleTag(field_layout_, cameraConfig)) {} 
     
-    auto PositionEstimatorIOCombined::Estimate3dPoseFromFoundTags(const std::vector<found_apriltag_t>& found_tags) -> std::vector<pose3d_estimate_t> {
-        if (found_tags.size() == 0){
+    auto PositionEstimatorIOCombined::Estimate3dPoseFromFoundTags(const found_apriltags_in_frame_t& found_tags) -> std::vector<pose3d_estimate_t> {
+        if (found_tags.found_tags.size() == 0){
             return {};
         }
 
-        else if (found_tags.size() == 1) {
+        else if (found_tags.found_tags.size() == 1) {
             return singletag_position_estimator_.Estimate3dPoseFromFoundTags(found_tags);
         }
 
