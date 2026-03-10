@@ -27,8 +27,8 @@ inline const camera::camera_config_t kBeatriceConfig = camera::camera_config_t{
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
+    1280,
     800,
-    600,
     120,
     frc::Transform3d(
         -12.255_in, 
@@ -58,8 +58,8 @@ inline const camera::camera_config_t kBelindaConfig = camera::camera_config_t{
     "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
+    1280,
     800,
-    600,
     120,
     frc::Transform3d(
         7.54_in, 
