@@ -25,7 +25,7 @@ inline const frc::AprilTagFieldLayout kFieldLayout = frc::AprilTagFieldLayout::L
 inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
     "bessie",
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
-    cv::CAP_V4L2,
+    cv::CAP_V4L,
     "MJPG",
     800,
     600,
@@ -55,19 +55,19 @@ inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
 // TODO extrinsics & intrinsics
 inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
     "elsie",
-    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1:1.0-video-index0",
+    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usb-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     800,
     600,
     120,
     frc::Transform3d(
-        7.54_in, 
-        1.5_in, 
-        20.094_in, 
+        -12.255_in, 
+        0.0_in, 
+        14.207_in, 
         frc::Rotation3d(
             0.0_rad,
-            0.261799_rad,
+            -0.523599_rad,
             0.0_rad
         )
     ),
@@ -90,10 +90,13 @@ auto main() -> int {
 
     camera::camera_config_t BessieConfig = kBessieConfig;
     camera::camera_config_t ElsieConfig = kElsieConfig;
+
     /* ~ CAMERA INIT ~ */
-    std::printf("Initializing Front Camera (Bessie)");
+    std::printf("Initializing Front Camera (Bessie)\n");
+
     camera::CameraIOCv frontCamera(BessieConfig);
     camera::CameraIOCv backCamera(ElsieConfig);
+
     // TODO Elsie Init
 
     /* ~ SEARCHER/ESTIMATOR INIT ~ */
@@ -126,14 +129,14 @@ auto main() -> int {
         }
     });
 
-        std::thread back_thread([&backCamera, &frontSearcher, &frontPoseEstimator, &backPublisher] () -> void {
+        std::thread back_thread([&backCamera, &backSearcher, &backPoseEstimator, &backPublisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
             camera::timestamped_frame_t tframe = backCamera.GetTimestampedFrame();
 
-            auto detections = frontSearcher.FindTagsFromTimestampedFrame(tframe);
+            auto detections = backSearcher.FindTagsFromTimestampedFrame(tframe);
 
-            auto pose = frontPoseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto pose = backPoseEstimator.Estimate3dPoseFromFoundTags(detections);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
             
@@ -143,7 +146,6 @@ auto main() -> int {
         }
     });
 
-    front_thread.join();
     back_thread.join();
     return 0;
 }
