@@ -1,59 +1,28 @@
-#include <frc/geometry/Rotation3d.h>
-#include <wpimath/frc/geometry/Transform3d.h>
-#include <cstdio>
-#include <iostream>
-#include <opencv2/highgui.hpp>
-#include <thread>
-#include "src/localization/PositionEstimatePublisher.h"
-#include "src/localization/PositionEstimatorIOCombined.h"
-#include "src/localization/TagSearcherIOAruco.h"
-#include "src/localization/TagSearcherIOWpiLib.h"
-#include "src/utils/NtUtils.h"
+// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
+// https://github.com/wmironpatriots
+//
+// File: u1_main.cc
+// Purpose: A Script for the O̶r̶a̶n̶g̶e Rubik Pi Unit (thanks dasun) connected to the Front and Back
+//          Camera of FRC 6423's 2026 Robot
+//
+// Open Source Software; you can modify and/or share it under the terms of
+// MIT license file in the root directory of this project
+
 #include "src/utils/PCH.h"
+#include "src/utils/NtUtils.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
-#include <units/length.h>
+#include "src/localization/TagSearcherIOWpiLib.h"
+#include "src/localization/PositionEstimatePublisher.h"
+#include "src/localization/PositionEstimatorIOCombined.h"
 
-/**
-    A Script for the O̶r̶a̶n̶g̶e Rubik Pi Unit (thanks dasun) connected to the Front and Back
-    Camera of FRC 6423's 2026 Robot
-*/
+// * ~~~~~~~~~~~~~ CONSTANTS ~~~~~~~~~~~~~
 
-inline const frc::AprilTagFieldLayout kFieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltWelded);
+/* Apriltag field layout to use */
+inline const frc::AprilTagFieldLayout FIELD_LAYOUT = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltWelded);
 
-// TODO intrinsics
-inline const camera::camera_config_t kBessieConfig = camera::camera_config_t{
-    "bessie",
-    "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
-    cv::CAP_V4L,
-    "MJPG",
-    800,
-    600,
-    120,
-    frc::Transform3d(
-        -12.255_in, 
-        0.0_in, 
-        14.207_in, 
-        frc::Rotation3d(
-            0.0_rad,
-            -0.523599_rad,
-            0.0_rad
-        )
-    ),
-    camera::camera_intrinsics_t{
-        625.3426025032783,
-        372.4797842477203,
-        898.0928868060495,
-        897.7157683218877,
-        0.04705864839856624,
-        -0.08074506402566872,
-        0.01743537811199019,
-        0.001136572471268671,
-        -0.0003280265291867128,
-    }
-};
-// TODO extrinsics & intrinsics
-inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
+/* Configuration for Elsie; the front camera */
+inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
     "elsie",
     "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usb-0:1:1.0-video-index0",
     cv::CAP_V4L2,
@@ -84,68 +53,105 @@ inline const camera::camera_config_t kElsieConfig = camera::camera_config_t{
     }
 };
 
+/* Configuration for Besie; the back camera */
+inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
+    "bessie",
+    "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
+    cv::CAP_V4L,
+    "MJPG",
+    800,
+    600,
+    120,
+    frc::Transform3d(
+        -12.255_in, 
+        0.0_in, 
+        14.207_in, 
+        frc::Rotation3d(
+            0.0_rad,
+            -0.523599_rad,
+            0.0_rad
+        )
+    ),
+    camera::camera_intrinsics_t{
+        625.3426025032783,
+        372.4797842477203,
+        898.0928868060495,
+        897.7157683218877,
+        0.04705864839856624,
+        -0.08074506402566872,
+        0.01743537811199019,
+        0.001136572471268671,
+        -0.0003280265291867128,
+    }
+};
+
 /** Entry Point */
 auto main() -> int {
+    // * ~~~~~~~~~~~~~ INITIAL CONFIGURATION ~~~~~~~~~~~~~
+
     utils::StartNetworkTables(false);
 
-    camera::camera_config_t BessieConfig = kBessieConfig;
-    camera::camera_config_t ElsieConfig = kElsieConfig;
+    // * ~~~~~~~~~~~~~ ELSIE (FRONT CAMERA) SETUP ~~~~~~~~~~~~~
 
-    /* ~ CAMERA INIT ~ */
-    std::printf("Initializing Front Camera (Bessie)\n");
+    std::printf("Initializing Elsie (Front Camera)\n");
 
-    camera::CameraIOCv frontCamera(BessieConfig);
-    camera::CameraIOCv backCamera(ElsieConfig);
-
-    // TODO Elsie Init
-
-    /* ~ SEARCHER/ESTIMATOR INIT ~ */
-    auto frontSearcher = localization::TagSearcherIOWpiLib();
-
-    auto frontPoseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kBessieConfig);
+    camera::camera_config_t elsie_config = ELSIE_CONFIG;
+    camera::CameraIOCv front_camera(elsie_config);
     
-    auto backSearcher = localization::TagSearcherIOWpiLib();
+    auto front_searcher = localization::TagSearcherIOWpiLib();
+    auto front_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, ELSIE_CONFIG);
 
-    auto backPoseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kElsieConfig);
+    auto front_nt_publisher = localization::PositionEstimatePublisher(BESSIE_CONFIG);
 
-    /* ~ PUBLISHER INIT ~ */
-    auto frontPublisher = localization::PositionEstimatePublisher(kBessieConfig);
-    auto backPublisher = localization::PositionEstimatePublisher(kElsieConfig);
-    /* ~ THREAD INIT ~ */
-    std::thread front_thread([&frontCamera, &frontSearcher, &frontPoseEstimator, &frontPublisher] () -> void {
+    // * ~~~~~~~~~~~~~ BESSIE (BACK CAMERA) SETUP ~~~~~~~~~~~~~
+
+    std::printf("Initializing Bessie (Back Camera)\n");
+
+    camera::camera_config_t bessie_config = BESSIE_CONFIG;
+    camera::CameraIOCv back_camera(bessie_config);
+
+    auto back_searcher = localization::TagSearcherIOWpiLib();
+    auto back_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BESSIE_CONFIG);
+
+    auto back_nt_publisher = localization::PositionEstimatePublisher(ELSIE_CONFIG);
+
+    // * ~~~~~~~~~~~~~ THREAD INIT ~~~~~~~~~~~~~
+
+    std::thread back_thread([&back_camera, &back_searcher, &back_pose_estimator, &front_nt_publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
-            camera::timestamped_frame_t tframe = frontCamera.GetTimestampedFrame();
+            camera::timestamped_frame_t tframe = back_camera.GetTimestampedFrame();
 
-            auto detections = frontSearcher.FindTagsFromTimestampedFrame(tframe);
+            auto detections = back_searcher.FindTagsFromTimestampedFrame(tframe);
 
-            auto pose = frontPoseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto pose = back_pose_estimator.Estimate3dPoseFromFoundTags(detections);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                frontPublisher.Publish(pose[0], latency.count());
+                front_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
 
-        std::thread back_thread([&backCamera, &backSearcher, &backPoseEstimator, &backPublisher] () -> void {
+    std::thread front_thread([&front_camera, &front_searcher, &front_pose_estimator, &back_nt_publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
-            camera::timestamped_frame_t tframe = backCamera.GetTimestampedFrame();
+            camera::timestamped_frame_t tframe = front_camera.GetTimestampedFrame();
 
-            auto detections = backSearcher.FindTagsFromTimestampedFrame(tframe);
+            auto detections = front_searcher.FindTagsFromTimestampedFrame(tframe);
 
-            auto pose = backPoseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto pose = front_pose_estimator.Estimate3dPoseFromFoundTags(detections);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                backPublisher.Publish(pose[0], latency.count());
+                back_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
 
-    back_thread.join();
+    front_thread.join();
+
     return 0;
 }
