@@ -1,2 +1,8 @@
 #!/bin/bash
+# Copy over new changes to rubik pi, recompile its program, and restart it
+
 rsync -avz ./ ubuntu@10.64.23.10:/home/ubuntu/
+
+ssh ubuntu@10.64.23.10 "systemctl stop 6423.service"
+ssh ubuntu@10.64.23.10 "cd ./iron-sight/ && cmake -B build -G Ninja && cmake --build build"
+ssh ubuntu@10.64.23.10 "systemctl restart 6423.service"

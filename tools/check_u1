@@ -1,0 +1,4 @@
+#!/bin/bash
+# Check status of rubik pi program
+
+ssh ubuntu@10.64.23.10 "systemctl status 6423.service"
