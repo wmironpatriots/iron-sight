@@ -19,7 +19,6 @@
 namespace localization {
     PositionEstimatorIOCombined::PositionEstimatorIOCombined(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig) : 
         field_layout_(std::move(fieldLayout)), 
-        camera_wrt_chassis_(cameraConfig.transform_wrt_chassis),
         camera_matrix_(utils::CameraMatrixFromIntrinsics(
             cameraConfig.intrinsics_calibration.fx,
             cameraConfig.intrinsics_calibration.fy, 

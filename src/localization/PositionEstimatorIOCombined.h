@@ -22,7 +22,6 @@ namespace localization {
             auto Estimate3dPoseFromFoundTags(const found_apriltags_in_frame_t& found_tags) -> std::vector<pose3d_estimate_t> override;
         private:
             frc::AprilTagFieldLayout field_layout_;
-            frc::Transform3d camera_wrt_chassis_;
             cv::Mat camera_matrix_;
             cv::Mat dist_coeffs_;
             localization::PositionEstimatorIOMultiTag multitag_position_estimator_;

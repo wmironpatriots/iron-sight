@@ -1,28 +1,27 @@
-#include <frc/geometry/Rotation3d.h>
-#include <wpimath/frc/geometry/Transform3d.h>
-#include <cstdio>
-#include <iostream>
-#include <opencv2/highgui.hpp>
-#include <thread>
-#include "src/localization/PositionEstimatePublisher.h"
-#include "src/localization/PositionEstimatorIOCombined.h"
-#include "src/localization/TagSearcherIOAruco.h"
-#include "src/localization/TagSearcherIOWpiLib.h"
-#include "src/utils/NtUtils.h"
+// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
+// https://github.com/wmironpatriots
+//
+// File: u2_main.cc
+// Purpose: A Script for the Raspberry Pi Unit connected to the Left and Right
+//          Camera of FRC 6423's 2026 Robot
+//
+// Open Source Software; you can modify and/or share it under the terms of
+// MIT license file in the root directory of this project
+
 #include "src/utils/PCH.h"
+#include "src/utils/NtUtils.h"
 #include "src/camera/CameraConfig.h"
 #include "src/camera/CameraIOCv.h"
-#include <units/length.h>
+#include "src/localization/TagSearcherIOWpiLib.h"
+#include "src/localization/PositionEstimatePublisher.h"
+#include "src/localization/PositionEstimatorIOCombined.h"
 
-/**
-    A Script for the Raspberry Pi Unit connected to the Left and Right
-    Camera of FRC 6423's 2026 Robot
-*/
+// * ~~~~~~~~~~~~~ CONSTANTS ~~~~~~~~~~~~~
 
-inline const frc::AprilTagFieldLayout kFieldLayout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltWelded);
+inline const frc::AprilTagFieldLayout FIELD_LAYOUT = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltWelded);
 
-// TODO intrinsics
-inline const camera::camera_config_t kBeatriceConfig = camera::camera_config_t{
+/* Configuration for Beatrice; the right camera */
+inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
     "beatrice",
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
@@ -30,16 +29,6 @@ inline const camera::camera_config_t kBeatriceConfig = camera::camera_config_t{
     1280,
     800,
     120,
-    frc::Transform3d(
-        -12.255_in, 
-        0.0_in, 
-        14.207_in, 
-        frc::Rotation3d(
-            0.0_rad,
-            -0.523599_rad,
-            0.0_rad
-        )
-    ),
     camera::camera_intrinsics_t{
         625.3426025032783,
         372.4797842477203,
@@ -52,8 +41,9 @@ inline const camera::camera_config_t kBeatriceConfig = camera::camera_config_t{
         -0.0003280265291867128,
     }
 };
-// TODO extrinsics & intrinsics
-inline const camera::camera_config_t kBelindaConfig = camera::camera_config_t{
+
+/* Configuration for Belinda; the left camera */
+inline const camera::camera_config_t BELINDA_CONFIG = camera::camera_config_t{
     "belinda",
     "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L2,
@@ -61,16 +51,6 @@ inline const camera::camera_config_t kBelindaConfig = camera::camera_config_t{
     1280,
     800,
     120,
-    frc::Transform3d(
-        7.54_in, 
-        1.5_in, 
-        20.094_in, 
-        frc::Rotation3d(
-            0.0_rad,
-            0.261799_rad,
-            0.0_rad
-        )
-    ),
     camera::camera_intrinsics_t{
         625.3426025032783,
         372.4797842477203,
@@ -86,63 +66,67 @@ inline const camera::camera_config_t kBelindaConfig = camera::camera_config_t{
 
 /** Entry Point */
 auto main() -> int {
+    // * ~~~~~~~~~~~~~ INITIAL CONFIGURATION ~~~~~~~~~~~~~
+
     utils::StartNetworkTables(false);
 
-    camera::camera_config_t BeatriceConfig = kBeatriceConfig;
-    camera::camera_config_t BelindaConfig = kBelindaConfig;
-    /* ~ CAMERA INIT ~ */
-    std::printf("Initializing Front Camera (Bessie)");
-    camera::CameraIOCv rightCamera(BeatriceConfig);
-    camera::CameraIOCv leftCamera(BelindaConfig);
-    // TODO Elsie Init
+    // * ~~~~~~~~~~~~~ BEATRICE (RIGHT CAMERA) SETUP ~~~~~~~~~~~~~
 
-    /* ~ SEARCHER/ESTIMATOR INIT ~ */
-    auto rightSearcher = localization::TagSearcherIOWpiLib();
+    camera::camera_config_t beatrice_config = BEATRICE_CONFIG;
+    camera::CameraIOCv right_camera(beatrice_config);
 
-    auto rightPoseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kBeatriceConfig);
+    auto right_searcher = localization::TagSearcherIOWpiLib();
+    auto right_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BEATRICE_CONFIG);
+
+    auto right_nt_publisher = localization::PositionEstimatePublisher(BEATRICE_CONFIG);
+
+    // * ~~~~~~~~~~~~~ BELINDA (LEFT CAMERA) SETUP ~~~~~~~~~~~~~
+
+    camera::camera_config_t belinda_config = BELINDA_CONFIG;
+    camera::CameraIOCv left_camera(belinda_config);
     
-    auto leftSearcher = localization::TagSearcherIOWpiLib();
+    auto left_searcher = localization::TagSearcherIOWpiLib();
+    auto left_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BELINDA_CONFIG);
 
-    auto leftPoseEstimator = localization::PositionEstimatorIOCombined(kFieldLayout, kBelindaConfig);
+    auto left_nt_publisher = localization::PositionEstimatePublisher(BELINDA_CONFIG);
 
-    /* ~ PUBLISHER INIT ~ */
-    auto rightPublisher = localization::PositionEstimatePublisher(kBeatriceConfig);
-    auto leftPublisher = localization::PositionEstimatePublisher(kBelindaConfig);
-    /* ~ THREAD INIT ~ */
-    std::thread right_thread([&rightCamera, &rightSearcher, &rightPoseEstimator, &rightPublisher] () -> void {
+    // * ~~~~~~~~~~~~~ THREAD INIT ~~~~~~~~~~~~~
+
+    std::thread right_thread([&right_camera, &right_searcher, &right_pose_estimator, &right_nt_publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
-            camera::timestamped_frame_t tframe = rightCamera.GetTimestampedFrame();
+            camera::timestamped_frame_t tframe = right_camera.GetTimestampedFrame();
 
-            auto detections = rightSearcher.FindTagsFromTimestampedFrame(tframe);
+            auto detections = right_searcher.FindTagsFromTimestampedFrame(tframe);
 
-            auto pose = rightPoseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto pose = right_pose_estimator.Estimate3dPoseFromFoundTags(detections);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                rightPublisher.Publish(pose[0], latency.count());
+                right_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
 
-        std::thread left_thread([&leftCamera, &leftSearcher, &leftPoseEstimator, &leftPublisher] () -> void {
+    std::thread left_thread([&left_camera, &left_searcher, &left_pose_estimator, &left_nt_publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
-            camera::timestamped_frame_t tframe = leftCamera.GetTimestampedFrame();
+            camera::timestamped_frame_t tframe = left_camera.GetTimestampedFrame();
 
-            auto detections = leftSearcher.FindTagsFromTimestampedFrame(tframe);
+            auto detections = left_searcher.FindTagsFromTimestampedFrame(tframe);
 
-            auto pose = leftPoseEstimator.Estimate3dPoseFromFoundTags(detections);
+            auto pose = left_pose_estimator.Estimate3dPoseFromFoundTags(detections);
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                leftPublisher.Publish(pose[0], latency.count());
+                left_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
 
     left_thread.join();
+
     return 0;
 }

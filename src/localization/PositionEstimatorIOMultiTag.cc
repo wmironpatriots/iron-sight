@@ -18,7 +18,6 @@
 namespace localization {
     PositionEstimatorIOMultiTag::PositionEstimatorIOMultiTag(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig) : 
         field_layout_(std::move(fieldLayout)), 
-        camera_wrt_chassis_(cameraConfig.transform_wrt_chassis),
         camera_matrix_(utils::CameraMatrixFromIntrinsics(
             cameraConfig.intrinsics_calibration.fx,
             cameraConfig.intrinsics_calibration.fy, 
@@ -88,8 +87,7 @@ namespace localization {
                             reprojectionErrors);
         //solvePnPGeneric should order the poses by lower reprojection error first
         auto cameraPose = frc::Pose3d().TransformBy(utils::OpenCvTransformToWpilibTransform(rvecs[0], tvecs[0]));
-        auto robotPose = cameraPose.TransformBy(camera_wrt_chassis_.Inverse());
-        estimates.emplace_back(pose3d_estimate_t(robotPose, found_tags.timestamp_seconds, reprojectionErrors.at<double>(0), found_tags.found_tags.size()));
+        estimates.emplace_back(pose3d_estimate_t(cameraPose, found_tags.timestamp_seconds, reprojectionErrors.at<double>(0), found_tags.found_tags.size()));
 
         return estimates;
     }

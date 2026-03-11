@@ -17,7 +17,6 @@
 namespace localization {
     PositionEstimatorIOSingleTag::PositionEstimatorIOSingleTag(frc::AprilTagFieldLayout fieldLayout, const camera::CameraConfig& cameraConfig) :
         field_layout_(std::move(fieldLayout)), 
-        camera_wrt_chassis_(cameraConfig.transform_wrt_chassis),
         camera_matrix_(utils::CameraMatrixFromIntrinsics(
             cameraConfig.intrinsics_calibration.fx,
             cameraConfig.intrinsics_calibration.fy, 
@@ -69,8 +68,7 @@ namespace localization {
                 
                 auto cameraWrtTag = utils::OpenCvTransformToWpilibTransform(rvecs[0], tvecs[0]);
                 auto cameraPose = tagPose.value().TransformBy(cameraWrtTag);
-                auto robotPose = cameraPose.TransformBy(camera_wrt_chassis_.Inverse());
-                estimates.emplace_back(pose3d_estimate_t(robotPose, found_tags.timestamp_seconds, reprojectionErrors.at<double>(0), 1));
+                estimates.emplace_back(pose3d_estimate_t(cameraPose, found_tags.timestamp_seconds, reprojectionErrors.at<double>(0), 1));
 
             } else {
 

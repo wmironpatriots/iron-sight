@@ -27,19 +27,9 @@ inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
     "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usb-0:1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
+    1280,
     800,
-    600,
     120,
-    frc::Transform3d(
-        -12.255_in, 
-        0.0_in, 
-        14.207_in, 
-        frc::Rotation3d(
-            0.0_rad,
-            -0.523599_rad,
-            0.0_rad
-        )
-    ),
     camera::camera_intrinsics_t{
         625.3426025032783,
         372.4797842477203,
@@ -59,19 +49,9 @@ inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
     cv::CAP_V4L,
     "MJPG",
+    1280,
     800,
-    600,
     120,
-    frc::Transform3d(
-        -12.255_in, 
-        0.0_in, 
-        14.207_in, 
-        frc::Rotation3d(
-            0.0_rad,
-            -0.523599_rad,
-            0.0_rad
-        )
-    ),
     camera::camera_intrinsics_t{
         625.3426025032783,
         372.4797842477203,
