@@ -15,15 +15,4 @@ find_package(OpenCV REQUIRED)
 find_package(wpilib REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-include(FetchContent)
-
-# Fetch Json
-FetchContent_Declare(
-  nlohmann_json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.12.0  # Or a specific hash for stability
-)
-
-FetchContent_MakeAvailable(nlohmann_json)
-
 add_subdirectory(src)

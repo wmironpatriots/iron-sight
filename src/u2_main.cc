@@ -20,10 +20,10 @@
 
 inline const frc::AprilTagFieldLayout FIELD_LAYOUT = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltWelded);
 
-/* Configuration for Beatrice; the right camera */
+/* Configuration for Beatrice; the right camera, top blue USB port */
 inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
     "beatrice",
-    "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
+    "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -42,10 +42,10 @@ inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
     }
 };
 
-/* Configuration for Belinda; the left camera */
+/* Configuration for Belinda; the left camera, bottom blue USB port */
 inline const camera::camera_config_t BELINDA_CONFIG = camera::camera_config_t{
     "belinda",
-    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1:1.0-video-index0",
+    "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.2:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -68,7 +68,7 @@ inline const camera::camera_config_t BELINDA_CONFIG = camera::camera_config_t{
 auto main() -> int {
     // * ~~~~~~~~~~~~~ INITIAL CONFIGURATION ~~~~~~~~~~~~~
 
-    utils::StartNetworkTables(false);
+    utils::StartNetworkTables(true);
 
     // * ~~~~~~~~~~~~~ BEATRICE (RIGHT CAMERA) SETUP ~~~~~~~~~~~~~
 
@@ -79,6 +79,7 @@ auto main() -> int {
     auto right_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BEATRICE_CONFIG);
 
     auto right_nt_publisher = localization::PositionEstimatePublisher(BEATRICE_CONFIG);
+    std::cout << "Beatrice started successfully!";
 
     // * ~~~~~~~~~~~~~ BELINDA (LEFT CAMERA) SETUP ~~~~~~~~~~~~~
 
@@ -89,7 +90,7 @@ auto main() -> int {
     auto left_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BELINDA_CONFIG);
 
     auto left_nt_publisher = localization::PositionEstimatePublisher(BELINDA_CONFIG);
-
+    std::cout << "Belinda started successfully!";
     // * ~~~~~~~~~~~~~ THREAD INIT ~~~~~~~~~~~~~
 
     std::thread right_thread([&right_camera, &right_searcher, &right_pose_estimator, &right_nt_publisher] () -> void {
