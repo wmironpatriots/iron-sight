@@ -43,14 +43,15 @@ inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
 };
 
 /* Configuration for Belinda; the left camera, bottom blue USB port */
+/* THIS IS THE BAD FPS CAMERA */
 inline const camera::camera_config_t BELINDA_CONFIG = camera::camera_config_t{
     "belinda",
     "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.2:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     1280,
-    800,
-    120,
+    720,
+    50,
     camera::camera_intrinsics_t{
         625.3426025032783,
         372.4797842477203,
