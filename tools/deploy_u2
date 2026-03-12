@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copy over new changes to rubik pi, recompile its program, and restart it
 
-rsync -av --delete --exclude=.cache/ --exclude=build/ --exclude=bin/ ./ ubuntu@10.64.23.10:/home/ubuntu/iron-sight
+rsync -av --delete --exclude=.cache/ --exclude=build/ --exclude=bin/ ./ ubuntu@10.64.23.11:/home/ubuntu/iron-sight
 CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 # run this on rubik: sudo visudo, then add "ubuntu ALL=(ALL) NOPASSWD: /bin/date" this is only needed once
-ssh ubuntu@10.64.23.10 "sudo date -s \"$CURRENT_TIME\" && cd ./iron-sight  && ./tools/build -j 4"
+ssh ubuntu@10.64.23.11 "sudo date -s \"$CURRENT_TIME\" && cd ./iron-sight  && ./tools/build -j 4"

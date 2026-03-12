@@ -1,0 +1,4 @@
+#!/bin/bash
+# Restart rubik pi main executable
+
+ssh ubuntu@10.64.23.11 "systemctl restart 6423.service"
