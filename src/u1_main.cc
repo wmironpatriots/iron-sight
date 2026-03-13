@@ -26,7 +26,7 @@ inline const frc::AprilTagFieldLayout FIELD_LAYOUT = frc::AprilTagFieldLayout::L
 //now, top blue port
 inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
     "elsie",
-    "",
+    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:2:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -46,10 +46,10 @@ inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
 };
 
 /* Configuration for Bessie; the back camera */
-// Bottom blue port
+// middle hub port
 inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
     "bessie",
-    "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
+    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1.2:1.0-video-index0",
     cv::CAP_V4L,
     "MJPG",
     1280,
@@ -68,10 +68,10 @@ inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
     }
 };
 
-/* Configuration for Beatrice; the right camera, closest to hub wire */
+/* Configuration for Beatrice; the right camera, furthest to hub wire */
 inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
     "beatrice",
-    "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.1:1.0-video-index0",
+    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1.3:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -90,11 +90,11 @@ inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
     }
 };
 
-/* Configuration for Belinda; the left camera, second closest to hub wire */
+/* Configuration for Belinda; the left camera, closest to hub wire */
 /* THIS IS THE BAD FPS CAMERA */
 inline const camera::camera_config_t BELINDA_CONFIG = camera::camera_config_t{
     "belinda",
-    "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.2:1.0-video-index0",
+    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usbv2-0:1.1:1.0-video-index0",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -245,7 +245,7 @@ auto main() -> int {
         }
     });
 
-    front_thread.join();
+    left_thread.join();
 
     return 0;
 }
