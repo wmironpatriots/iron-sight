@@ -176,7 +176,6 @@ auto main() -> int {
     std::printf("Belinda started successfully!\n");
 
     // * ~~~~~~~~~~~~~ THREAD INIT ~~~~~~~~~~~~~
-    //* THIS USED TO USE FRONT PUBLISHER FOR BACK CAMERA, IF SOMETHING BREAKS, REVERT
 
     std::thread back_thread([&back_camera, &back_searcher, &back_pose_estimator, &back_nt_publisher] () -> void {
         while (true) {
