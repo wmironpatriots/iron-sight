@@ -22,9 +22,11 @@
 inline const frc::AprilTagFieldLayout FIELD_LAYOUT = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2026RebuiltWelded);
 
 /* Configuration for Elsie; the front camera */
+//og  /dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usb-0:1:1.0-video-index0
+//now, top blue port
 inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
     "elsie",
-    "/dev/v4l/by-path/platform-1c00000.pci-pci-0000:01:00.0-usb-0:1:1.0-video-index0",
+    "",
     cv::CAP_V4L2,
     "MJPG",
     1280,
@@ -44,6 +46,7 @@ inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
 };
 
 /* Configuration for Bessie; the back camera */
+// Bottom blue port
 inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
     "bessie",
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
@@ -126,7 +129,7 @@ auto main() -> int {
     auto front_searcher = localization::TagSearcherIOWpiLib();
     auto front_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, ELSIE_CONFIG);
 
-    auto front_nt_publisher = localization::PositionEstimatePublisher(BESSIE_CONFIG);
+    auto front_nt_publisher = localization::PositionEstimatePublisher(ELSIE_CONFIG);
 
     std::printf("Elsie started successfully!\n");
 
@@ -140,7 +143,7 @@ auto main() -> int {
     auto back_searcher = localization::TagSearcherIOWpiLib();
     auto back_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BESSIE_CONFIG);
 
-    auto back_nt_publisher = localization::PositionEstimatePublisher(ELSIE_CONFIG);
+    auto back_nt_publisher = localization::PositionEstimatePublisher(BESSIE_CONFIG);
 
     std::printf("Bessie started successfully!\n");
 
@@ -159,6 +162,7 @@ auto main() -> int {
     std::printf("Beatrice started successfully!\n");
 
     // * ~~~~~~~~~~~~~ BELINDA (LEFT CAMERA) SETUP ~~~~~~~~~~~~~
+
     std::printf("Initializing Belinda (Left Camera)\n");
 
     camera::camera_config_t belinda_config = BELINDA_CONFIG;
@@ -172,8 +176,9 @@ auto main() -> int {
     std::printf("Belinda started successfully!\n");
 
     // * ~~~~~~~~~~~~~ THREAD INIT ~~~~~~~~~~~~~
+    //* THIS USED TO USE FRONT PUBLISHER FOR BACK CAMERA, IF SOMETHING BREAKS, REVERT
 
-    std::thread back_thread([&back_camera, &back_searcher, &back_pose_estimator, &front_nt_publisher] () -> void {
+    std::thread back_thread([&back_camera, &back_searcher, &back_pose_estimator, &back_nt_publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
             camera::timestamped_frame_t tframe = back_camera.GetTimestampedFrame();
@@ -185,12 +190,12 @@ auto main() -> int {
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                front_nt_publisher.Publish(pose[0], latency.count());
+                back_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
 
-    std::thread front_thread([&front_camera, &front_searcher, &front_pose_estimator, &back_nt_publisher] () -> void {
+    std::thread front_thread([&front_camera, &front_searcher, &front_pose_estimator, &front_nt_publisher] () -> void {
         while (true) {
             auto start = std::chrono::high_resolution_clock::now();
             camera::timestamped_frame_t tframe = front_camera.GetTimestampedFrame();
@@ -202,7 +207,7 @@ auto main() -> int {
             std::chrono::duration<double> latency = end - start;
             
             if (!pose.empty()) {
-                back_nt_publisher.Publish(pose[0], latency.count());
+                front_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
