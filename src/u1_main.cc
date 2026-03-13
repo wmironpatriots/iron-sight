@@ -43,7 +43,7 @@ inline const camera::camera_config_t ELSIE_CONFIG = camera::camera_config_t{
     }
 };
 
-/* Configuration for Besie; the back camera */
+/* Configuration for Bessie; the back camera */
 inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
     "bessie",
     "/dev/v4l/by-path/platform-xhci-hcd.0.auto-usbv2-0:1:1.0-video-index0",
@@ -52,6 +52,51 @@ inline const camera::camera_config_t BESSIE_CONFIG = camera::camera_config_t{
     1280,
     800,
     120,
+    camera::camera_intrinsics_t{
+        625.3426025032783,
+        372.4797842477203,
+        898.0928868060495,
+        897.7157683218877,
+        0.04705864839856624,
+        -0.08074506402566872,
+        0.01743537811199019,
+        0.001136572471268671,
+        -0.0003280265291867128,
+    }
+};
+
+/* Configuration for Beatrice; the right camera, closest to hub wire */
+inline const camera::camera_config_t BEATRICE_CONFIG = camera::camera_config_t{
+    "beatrice",
+    "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.1:1.0-video-index0",
+    cv::CAP_V4L2,
+    "MJPG",
+    1280,
+    800,
+    120,
+    camera::camera_intrinsics_t{
+        625.3426025032783,
+        372.4797842477203,
+        898.0928868060495,
+        897.7157683218877,
+        0.04705864839856624,
+        -0.08074506402566872,
+        0.01743537811199019,
+        0.001136572471268671,
+        -0.0003280265291867128,
+    }
+};
+
+/* Configuration for Belinda; the left camera, second closest to hub wire */
+/* THIS IS THE BAD FPS CAMERA */
+inline const camera::camera_config_t BELINDA_CONFIG = camera::camera_config_t{
+    "belinda",
+    "/dev/v4l/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usbv2-0:1.2:1.0-video-index0",
+    cv::CAP_V4L2,
+    "MJPG",
+    1280,
+    720,
+    50,
     camera::camera_intrinsics_t{
         625.3426025032783,
         372.4797842477203,
@@ -83,6 +128,8 @@ auto main() -> int {
 
     auto front_nt_publisher = localization::PositionEstimatePublisher(BESSIE_CONFIG);
 
+    std::printf("Elsie started successfully!\n");
+
     // * ~~~~~~~~~~~~~ BESSIE (BACK CAMERA) SETUP ~~~~~~~~~~~~~
 
     std::printf("Initializing Bessie (Back Camera)\n");
@@ -94,6 +141,35 @@ auto main() -> int {
     auto back_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BESSIE_CONFIG);
 
     auto back_nt_publisher = localization::PositionEstimatePublisher(ELSIE_CONFIG);
+
+    std::printf("Bessie started successfully!\n");
+
+    // * ~~~~~~~~~~~~~ BEATRICE (RIGHT CAMERA) SETUP ~~~~~~~~~~~~~
+
+    std::printf("Initializing Beatrice (Right Camera)\n");
+
+    camera::camera_config_t beatrice_config = BEATRICE_CONFIG;
+    camera::CameraIOCv right_camera(beatrice_config);
+
+    auto right_searcher = localization::TagSearcherIOWpiLib();
+    auto right_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BEATRICE_CONFIG);
+
+    auto right_nt_publisher = localization::PositionEstimatePublisher(BEATRICE_CONFIG);
+
+    std::printf("Beatrice started successfully!\n");
+
+    // * ~~~~~~~~~~~~~ BELINDA (LEFT CAMERA) SETUP ~~~~~~~~~~~~~
+    std::printf("Initializing Belinda (Left Camera)\n");
+
+    camera::camera_config_t belinda_config = BELINDA_CONFIG;
+    camera::CameraIOCv left_camera(belinda_config);
+    
+    auto left_searcher = localization::TagSearcherIOWpiLib();
+    auto left_pose_estimator = localization::PositionEstimatorIOCombined(FIELD_LAYOUT, BELINDA_CONFIG);
+
+    auto left_nt_publisher = localization::PositionEstimatePublisher(BELINDA_CONFIG);
+
+    std::printf("Belinda started successfully!\n");
 
     // * ~~~~~~~~~~~~~ THREAD INIT ~~~~~~~~~~~~~
 
@@ -127,6 +203,40 @@ auto main() -> int {
             
             if (!pose.empty()) {
                 back_nt_publisher.Publish(pose[0], latency.count());
+            }
+        }
+    });
+
+    std::thread right_thread([&right_camera, &right_searcher, &right_pose_estimator, &right_nt_publisher] () -> void {
+        while (true) {
+            auto start = std::chrono::high_resolution_clock::now();
+            camera::timestamped_frame_t tframe = right_camera.GetTimestampedFrame();
+
+            auto detections = right_searcher.FindTagsFromTimestampedFrame(tframe);
+
+            auto pose = right_pose_estimator.Estimate3dPoseFromFoundTags(detections);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> latency = end - start;
+            
+            if (!pose.empty()) {
+                right_nt_publisher.Publish(pose[0], latency.count());
+            }
+        }
+    });
+
+    std::thread left_thread([&left_camera, &left_searcher, &left_pose_estimator, &left_nt_publisher] () -> void {
+        while (true) {
+            auto start = std::chrono::high_resolution_clock::now();
+            camera::timestamped_frame_t tframe = left_camera.GetTimestampedFrame();
+
+            auto detections = left_searcher.FindTagsFromTimestampedFrame(tframe);
+
+            auto pose = left_pose_estimator.Estimate3dPoseFromFoundTags(detections);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> latency = end - start;
+            
+            if (!pose.empty()) {
+                left_nt_publisher.Publish(pose[0], latency.count());
             }
         }
     });
