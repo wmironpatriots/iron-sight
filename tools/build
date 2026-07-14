@@ -1,4 +1,4 @@
 #!/bin/bash
 # Build and run clang tidy
-cmake -B build -G Ninja
+cmake -DENABLE_CLANG_TIDY=ON -B build -G Ninja
 cmake --build build

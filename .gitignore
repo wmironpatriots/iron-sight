@@ -60,3 +60,4 @@ Intermediates/
 **.csproj
 
 build/
+.cache/

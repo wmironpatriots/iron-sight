@@ -1,0 +1,80 @@
+// Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
+// https://github.com/wmironpatriots
+//
+// Header: TagSearcherIOOfficial.h
+// 
+// Open Source Software; you can modify and/or share it under the terms of
+// MIT license file in the root directory of this project
+
+#include "src/localization/TagSearcherIOAruco.h"
+#include <opencv2/objdetect/aruco_detector.hpp>
+#include <opencv2/objdetect/aruco_dictionary.hpp>
+#include "src/localization/TagSearcherIO.h"
+
+namespace localization {
+    TagSearcherIOAruco::TagSearcherIOAruco() {
+        auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_APRILTAG_36h11);
+
+        auto params = cv::aruco::DetectorParameters();
+        // Allow the adaptive threshold window to scale with the image so that tags
+        // at varying distances are reliably segmented.
+        params.adaptiveThreshWinSizeMin = 3;
+        params.adaptiveThreshWinSizeMax = 53;
+        params.adaptiveThreshWinSizeStep = 10;
+        // Tighten the minimum marker perimeter relative to image size so that tiny,
+        // unreliable blobs are rejected early.
+        params.minMarkerPerimeterRate = 0.02;
+        params.maxMarkerPerimeterRate = 4.0;
+        // Use corner refinement for sub-pixel accuracy, which improves downstream
+        // PnP accuracy.
+        params.cornerRefinementMethod = cv::aruco::CORNER_REFINE_SUBPIX;
+        params.cornerRefinementWinSize = 5;
+        params.cornerRefinementMaxIterations = 30;
+        params.cornerRefinementMinAccuracy = 0.1;
+
+        detector_ = cv::aruco::ArucoDetector(dictionary, params);
+    }
+
+    auto TagSearcherIOAruco::FindTagsFromTimestampedFrame(const camera::timestamped_frame_t& tframe) -> found_apriltags_in_frame_t {
+        // Handle Empty Frame
+        if (tframe.frame.empty()) {
+            return {};
+        }
+
+        // Convert frame to grayscale
+        cv::Mat gray_frame;
+        cv::cvtColor(tframe.frame, gray_frame, cv::COLOR_BGR2GRAY); 
+
+        // Create output vecs
+        int number_tags;
+        std::vector<int> marker_ids;
+        std::vector<cv::Point2f> marker_center;
+        std::vector<std::vector<cv::Point2f>> marker_corners, rejected;
+
+        // Fill vecs
+        detector_.detectMarkers(gray_frame, marker_corners, marker_ids, rejected);
+
+        // Handle no detections
+        if (marker_ids.empty()) return {};
+        marker_center.resize(marker_ids.size());
+        
+        // Process output vecs into detection vec
+        found_apriltags_in_frame_t tags;
+        tags.timestamp_seconds = tframe.timestamp_seconds;
+        number_tags = static_cast<int>(marker_ids.size());
+        for (int i = 0; i < number_tags; i++) {
+            auto& tag = tags.found_tags.emplace_back();
+
+            tag.tag_id = marker_ids[i];
+            tag.center_coords = marker_center[i];
+            //tag.timestamp_seconds = tframe.timestamp_seconds;
+
+            for (int j = 0; j < 4; j++) {
+                //opencv coords
+                tag.corner_coords[j] = marker_corners[i][j];
+            }
+        }
+
+        return tags;
+    }
+}

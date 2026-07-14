@@ -2,40 +2,37 @@
 // https://github.com/wmironpatriots
 //
 // File: Camera.h
-// Purpose: Define camera structs & base camera class
+// Purpose: Define the CameraIO class and the structs it uses
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
+
 #pragma once
 
+#include "src/camera/CameraConfig.h"
 #include "src/utils/PCH.h"
 
 namespace camera {
-    /** Represents a camera  */
-    struct CameraConfig {
-        /** camera id */
-        int deviceId;
-        /** API backend to use */
-        int apiId;
-    };
 
-    /** Represents a camera frame recorded at a specified timestamp */
-    struct TimestampedFrame {
-        /** Represents the recorded frame */
+    /** Camera frame recorded at a specified timestamp */
+    using timestamped_frame_t = struct timestamped_frame_t {
+        /** Image data of the frame */
         cv::Mat frame;
-        /** Timestamp representing when frame was captured */
-        units::second_t timestamp;
+        /** Match timestamp frame was recorded in */
+        double timestamp_seconds;
     };
 
-    /** Hardware interface for interacting with a camera */
-    class Camera {
+    /** Hardware Interface for interacting with a Camera */
+    class CameraIO {
         public:
-            virtual ~Camera() = default;
-            /** @return dense matrix representing raw recorded frame */
-            virtual auto getFrame() -> cv::Mat;
-            /** returns TimestampedFrame representing the frame recorded at a specific timestamp*/
-            virtual auto getTimestampedFrame() -> TimestampedFrame;
-        private:
-            cv::VideoCapture mCapture;
+            virtual ~CameraIO() = default;
+            /** Return camera configuration */
+            virtual auto GetConfig() -> camera_config_t = 0;
+            /** Return the latest timestamped frame recorded by camera */
+            virtual auto GetTimestampedFrame() -> timestamped_frame_t = 0;
+            /** Attempt to reinitialize camera */
+            virtual auto Restart() -> void = 0;
+
     };
+
 }

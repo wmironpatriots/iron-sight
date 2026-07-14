@@ -2,7 +2,7 @@
 // https://github.com/wmironpatriots
 //
 // File: PCH.h
-// Purpose: Compile all headers at once for faster compile times
+// Purpose: Compile commonly use headers once for faster compile times
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
@@ -11,6 +11,7 @@
 
 // C++ Standard Library
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -25,6 +26,12 @@
 #include <opencv4/opencv2/highgui.hpp>
 #include <opencv4/opencv2/imgcodecs.hpp>
 #include <opencv4/opencv2/imgproc.hpp>
+#include "opencv4/opencv2/dnn.hpp"
+
+// AprilTag
+#include <frc/apriltag/AprilTagFieldLayout.h>
+#include <apriltag/apriltag.h>
+#include <apriltag/tag36h11.h>
 
 // Eigen
 #include <Eigen/Core>
@@ -33,9 +40,15 @@
 #include <sleipnir/optimization/problem.hpp>
 
 // FRC/WPILib
-#include <wpilibc/frc/DataLogManager.h>
 #include <wpilibc/frc/Timer.h>
+#include <wpilibc/frc/DataLogManager.h>
 #include <ntcore/networktables/NetworkTableInstance.h>
+#include <wpimath/frc/geometry/Pose3d.h>
+#include <wpimath/frc/geometry/Transform3d.h>
+#include <wpimath/frc/geometry/Translation3d.h>
+#include <wpimath/frc/geometry/Rotation3d.h>
 
-// JSON
-#include <nlohmann/json.hpp>
+// NetworkTables
+#include <networktables/NetworkTable.h>
+#include <networktables/StructTopic.h>
+#include <networktables/DoubleTopic.h>

@@ -1,21 +1,33 @@
 // Copyright (c) 2026 FRC 6423 - Ward Melville Iron Patriots
 // https://github.com/wmironpatriots
+//
+// Header: NtUtils.h
 // 
 // Open Source Software; you can modify and/or share it under the terms of
 // MIT license file in the root directory of this project
+
 #include "src/utils/NtUtils.h"
 
 namespace utils {
-    void StartNetworkTables() {
-        nt::NetworkTableInstance instance = nt::NetworkTableInstance::GetDefault();
+    void StartNetworkTables(bool isSimulated) {
+        nt::NetworkTableInstance instance = kNtInstance;
 
+        instance.StopServer();
         instance.StopClient();
-        instance.StopLocal();
 
         instance.StartClient4("iron-sight");
-        instance.SetServerTeam(6423);
+        instance.SetServerTeam(kTeamNumber);
+        instance.StartDSClient();
+        if (isSimulated) instance.SetServer("127.0.0.1", nt::NetworkTableInstance::kDefaultPort4);
+        instance.StartDSClient();
 
-        frc::DataLogManager::Start("/iron-sight/logs");
-        printf("Started NetworkTables");
+        // frc::DataLogManager::Start(kPrefix + "/logs");
+
+        printf("Waiting for Connection to %d\n", kTeamNumber);
+        while (!kNtInstance.IsConnected()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+        printf("Connected!\n");
     }
 }
